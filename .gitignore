@@ -1,0 +1,102 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Production/runtime artifacts
+*.tsbuildinfo
+next-env.d.ts
+.vercel/
+.netlify/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+.env.test
+.envrc
+*.local
+
+# Certificates, private keys, and payment gateway credentials
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.crt
+*.cer
+*.csr
+*.jks
+*.keystore
+*.mobileprovision
+*.provisionprofile
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# Local caches
+.cache/
+.turbo/
+.parcel-cache/
+.swc/
+.rpt2_cache/
+.npm/
+.pnpm-store/
+
+# Test and coverage output
+__tests__/
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+blob-report/
+
+# Supabase local development state
+supabase/.branches/
+supabase/.temp/
+supabase/.env
+supabase/.env.*
+supabase/seed.local.sql
+
+# Databases and local dumps
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.sql
+!supabase/**/*.sql
+*.dump
+*.sql.gz
+*.tar.gz
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+
+# Local agent/tooling metadata
+.agents/
+.codex/
+
+# Misc generated files
+*.tmp
+*.temp
+*.bak
+*.orig
