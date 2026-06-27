@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       webhook_url: `${process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "")}/api/webhooks/efipay?hmac=***`,
     });
   } catch (e) {
+    console.error('[register-webhook] erro:', e);
     return err(e);
   }
 }

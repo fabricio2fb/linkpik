@@ -4,6 +4,7 @@ import { ApiError } from "./errors";
 import { createSupabaseService } from "./supabase-service";
 import { decryptGatewayToken, encryptGatewayToken } from "./mercadopago";
 import { refreshDefaultPaymentGatewayAfterDisconnect } from "./payment-gateway";
+import { centavosToReais } from "@/lib/utils";
 
 const EFIPAY_API = process.env.EFIPAY_API_BASE_URL ?? "https://pix.api.efipay.com.br";
 const GATEWAY = "efipay";
@@ -240,8 +241,9 @@ export async function createEfipayPixCharge(params: {
   const token = await getEfipayToken(clientId, clientSecret);
   const pixKey = params.account.public_key;
 
-  const valorBruto = Number(params.amount.toFixed(2));
-  const taxaPikbio = Number(params.platformFee.toFixed(2));
+  // Efi PIX espera valor em reais decimais, nao centavos: converter aqui, na fronteira com a API externa.
+  const valorBruto = centavosToReais(params.amount);
+  const taxaPikbio = centavosToReais(params.platformFee);
 
   const body: Record<string, unknown> = {
     calendario: { expiracao: 3600 },
@@ -309,7 +311,7 @@ export async function createEfipayBankSlip(params: {
   if (!clientId) throw new ApiError(400, "Client ID ausente na conta Efipay");
 
   const token = await getEfipayToken(clientId, clientSecret);
-  const valorBruto = Math.round(params.amount * 100);
+  const valorBruto = Math.round(params.amount);
   const feePercent = Math.round((params.platformFee / params.amount) * 100);
   const body: Record<string, unknown> = {
     items: [{

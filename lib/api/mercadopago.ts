@@ -2,6 +2,7 @@ import { createCipheriv, createDecipheriv, createHash, createHmac, randomBytes, 
 import { ApiError } from "./errors";
 import { refreshDefaultPaymentGatewayAfterDisconnect } from "./payment-gateway";
 import { createSupabaseService } from "./supabase-service";
+import { centavosToReais } from "@/lib/utils";
 
 const MP_API = "https://api.mercadopago.com";
 const GATEWAY = "mercadopago";
@@ -268,7 +269,8 @@ export async function createMarketplacePreference(params: {
         title: params.productTitle,
         quantity: 1,
         currency_id: "BRL",
-        unit_price: Number(params.amount.toFixed(2)),
+        // Mercado Pago espera valor em reais decimais, nao centavos: converter aqui, na fronteira com a API externa.
+        unit_price: centavosToReais(params.amount),
       }],
       payer: {
         name: params.buyerName,
@@ -278,7 +280,8 @@ export async function createMarketplacePreference(params: {
           number: params.buyerCpf,
         },
       },
-      marketplace_fee: Number(params.platformFee.toFixed(2)),
+      // Mercado Pago espera valor em reais decimais, nao centavos: converter aqui, na fronteira com a API externa.
+      marketplace_fee: centavosToReais(params.platformFee),
       external_reference: params.orderId,
       notification_url: `${appUrl}/api/webhooks/mercadopago`,
       back_urls: {
@@ -322,7 +325,8 @@ export async function createMercadoPagoPixPayment(params: {
       "X-Idempotency-Key": crypto.randomUUID(),
     },
     body: JSON.stringify({
-      transaction_amount: Number(params.amount.toFixed(2)),
+      // Mercado Pago espera valor em reais decimais, nao centavos: converter aqui, na fronteira com a API externa.
+      transaction_amount: centavosToReais(params.amount),
       description: params.productTitle,
       payment_method_id: "pix",
       payer: {
@@ -337,7 +341,8 @@ export async function createMercadoPagoPixPayment(params: {
       notification_url: `${appUrl}/api/webhooks/mercadopago`,
       // Em /v1/payments, o Mercado Pago desconta primeiro a taxa propria dele
       // e depois aplica o application_fee da plataforma sobre o restante.
-      application_fee: Number(params.platformFee.toFixed(2)),
+      // Mercado Pago espera valor em reais decimais, nao centavos: converter aqui, na fronteira com a API externa.
+      application_fee: centavosToReais(params.platformFee),
       statement_descriptor: "PIKBIO",
     }),
   });

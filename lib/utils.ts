@@ -5,6 +5,10 @@ export function formatPrice(cents: number) {
   }).format(cents / 100);
 }
 
+export function centavosToReais(cents: number): number {
+  return Number((cents / 100).toFixed(2));
+}
+
 export function getInitials(name?: string | null) {
   const parts = name?.trim().split(/\s+/).filter(Boolean) ?? [];
   if (!parts.length) return "U";
