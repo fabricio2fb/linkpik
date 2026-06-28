@@ -68,8 +68,8 @@ export default async function AdminExclusaoPage(props: {
   ]
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8">
-      <header className="flex items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-6 sm:py-8">
+      <header className="grid gap-4 sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Privacidade (LGPD)</h1>
           <p className="mt-1 text-sm text-gray-500">Central de tratamento de dados pessoais</p>
@@ -157,9 +157,9 @@ export default async function AdminExclusaoPage(props: {
       )}
 
       <section className="space-y-3">
-        <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-3 sm:flex sm:items-center sm:justify-between">
           <h2 className="font-heading text-lg font-bold text-gray-900">Historico</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0">
             {statusOptions.map((o) => {
               const params = new URLSearchParams()
               if (o.value) params.set("status", o.value)

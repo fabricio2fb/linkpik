@@ -91,11 +91,11 @@ export default function PinTotpGate({ adminEmail, totpConfigured }: PinTotpGateP
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-6">
+      <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-lg sm:p-8">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-bold text-gray-900">Painel Administrativo</h1>
-          <p className="mt-1 text-sm text-gray-500">{adminEmail}</p>
+          <p className="mt-1 break-all text-sm text-gray-500">{adminEmail}</p>
         </div>
 
         {step === "setup" && (
@@ -118,7 +118,7 @@ export default function PinTotpGate({ adminEmail, totpConfigured }: PinTotpGateP
                 <img
                   src={qrDataUrl}
                   alt="QR code para configurar 2FA"
-                  className="h-64 w-64 rounded-lg border"
+                  className="h-56 w-56 rounded-lg border sm:h-64 sm:w-64"
                 />
               </div>
             )}

@@ -67,6 +67,7 @@ export default function DashboardPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [onboarding, setOnboarding] = useState<Onboarding | null>(null);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("pending");
+  const [paymentStatusLoaded, setPaymentStatusLoaded] = useState(false);
   const [overview, setOverview] = useState<{ summary?: Record<string, number> } | null>(null);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState<string | null>(null);
@@ -84,6 +85,7 @@ export default function DashboardPage() {
     }
 
     setLoading(true);
+    setPaymentStatusLoaded(false);
     Promise.all([
       fetch(`/api/analytics/${session.creator.username}?days=30`, { credentials: "include" }),
       fetch("/api/orders?limit=5", { credentials: "include" }),
@@ -97,6 +99,7 @@ export default function DashboardPage() {
         setSales((ordersPayload.data?.orders ?? []).map(mapApiOrder));
         setOnboarding(onboardingPayload.data ?? null);
         setPaymentStatus(paymentPayload.data?.status ?? "pending");
+        setPaymentStatusLoaded(true);
         setOverview(overviewPayload.data ?? null);
       })
       .catch(() => {
@@ -135,7 +138,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {paymentStatus !== "active" && (
+      {paymentStatusLoaded && paymentStatus !== "active" && (
         <PaymentStatusBanner status={paymentStatus} />
       )}
 

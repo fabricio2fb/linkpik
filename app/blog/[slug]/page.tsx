@@ -105,7 +105,7 @@ export default async function BlogPostPage({ params }: Props) {
 
           <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_300px]">
             <div
-              className="prose max-w-none prose-headings:font-heading prose-headings:font-black prose-a:text-[#FF4D6D] prose-a:underline prose-a:underline-offset-2 prose-img:rounded-2xl"
+              className="blog-content max-w-none"
               dangerouslySetInnerHTML={{ __html: cleanHtml }}
             />
 

@@ -41,12 +41,12 @@ export default function DataTable({ columns, rows, onRowClick }: DataTableProps)
         {rows.map((row, index) => (
           <div
             key={index}
-            className={`rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 ${onRowClick ? "cursor-pointer" : ""}`}
+            className={`min-w-0 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 ${onRowClick ? "cursor-pointer" : ""}`}
             onClick={onRowClick ? () => onRowClick(row) : undefined}
           >
             {columns.map((column) => (
-              <div key={column.key} className="flex items-center justify-between gap-4 border-b border-[var(--border-subtle)] py-2 last:border-0">
-                <span className="text-xs font-bold uppercase text-[var(--text-tertiary)]">{column.label}</span>
+              <div key={column.key} className="flex min-w-0 items-start justify-between gap-4 border-b border-[var(--border-subtle)] py-2 last:border-0">
+                <span className="shrink-0 text-xs font-bold uppercase text-[var(--text-tertiary)]">{column.label}</span>
                 {column.render ? column.render(row) : <Cell value={row[column.key]} tone={column.tone} compact />}
               </div>
             ))}
@@ -66,6 +66,6 @@ function Cell({ value, tone = "default", compact = false }: { value: TableRow[st
   if (tone === "success") return <Badge tone="success">{text}</Badge>;
   if (tone === "warning") return <Badge tone="warning">{text}</Badge>;
   if (tone === "danger") return <Badge tone="danger">{text}</Badge>;
-  if (tone === "accent") return <span className="font-bold text-[#FF4D6D]">{text}</span>;
-  return <span className={`${compact ? "text-right" : ""} font-semibold text-[var(--text-primary)]`}>{text}</span>;
+  if (tone === "accent") return <span className="min-w-0 break-words text-right font-bold text-[#FF4D6D]">{text}</span>;
+  return <span className={`${compact ? "text-right" : ""} min-w-0 break-words font-semibold text-[var(--text-primary)]`}>{text}</span>;
 }

@@ -31,9 +31,11 @@ export default function DashboardVendasPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [summary, setSummary] = useState({ count: 0, amount: 0 });
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>("pending");
+  const [paymentStatusLoaded, setPaymentStatusLoaded] = useState(false);
   const perPage = 5;
 
   useEffect(() => {
+    setPaymentStatusLoaded(false);
     const dateRange = getDateRange(filter);
     const params = new URLSearchParams({ limit: "50" });
     if (dateRange.from) params.set("from", dateRange.from);
@@ -51,6 +53,7 @@ export default function DashboardVendasPage() {
           amount: Number(ordersPayload.data?.total_amount ?? 0),
         });
         setPaymentStatus(paymentPayload.data?.status ?? "pending");
+        setPaymentStatusLoaded(true);
       })
       .catch(() => {
         setSales([]);
@@ -73,7 +76,7 @@ export default function DashboardVendasPage() {
           ))}
         </div>
       </header>
-      {paymentStatus !== "active" && <PaymentStatusBanner status={paymentStatus} />}
+      {paymentStatusLoaded && paymentStatus !== "active" && <PaymentStatusBanner status={paymentStatus} />}
       <Card className="p-5">
         <p className="text-sm font-semibold text-[var(--text-secondary)]">Total do periodo</p>
         <p className="mt-2 font-heading text-3xl font-extrabold text-[var(--text-primary)]">{formatPrice(summary.amount)}</p>

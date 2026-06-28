@@ -46,7 +46,7 @@ export default function CreatorActions({ creatorId, isSuspended }: Props) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-3">
+      <div className="grid gap-3 sm:flex sm:flex-wrap">
         <Button onClick={toggleSuspend} loading={loading === "suspend"} variant={suspended ? "primary" : "secondary"}>
           {suspended ? "Reativar conta" : "Suspender conta"}
         </Button>

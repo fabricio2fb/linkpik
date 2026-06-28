@@ -194,7 +194,7 @@ export default function BlogForm({ initialData }: Props) {
 
   return (
     <>
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:py-8">
         <Link
           href="/admin/blog"
           className="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 transition hover:text-gray-800"
@@ -210,7 +210,7 @@ export default function BlogForm({ initialData }: Props) {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="space-y-6">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6">
                 <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.06em] text-gray-400">Conteudo</h2>
 
                 <div className="space-y-4">
@@ -251,13 +251,13 @@ export default function BlogForm({ initialData }: Props) {
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-gray-700">Imagem de capa</label>
-                    <div className="flex items-start gap-3">
+                    <div className="grid gap-3 sm:flex sm:items-start">
                       <input
                         type="text"
                         value={coverImageUrl}
                         onChange={(e) => setCoverImageUrl(e.target.value)}
                         placeholder="URL da imagem"
-                        className="input-base h-11 flex-1 px-3"
+                        className="input-base h-11 min-w-0 flex-1 px-3"
                       />
                       <label className="inline-flex h-11 w-11 cursor-pointer items-center justify-center rounded-[10px] border border-gray-200 text-gray-400 transition hover:border-[#FF4D6D] hover:text-[#FF4D6D]">
                         <Upload size={18} />
@@ -289,7 +289,7 @@ export default function BlogForm({ initialData }: Props) {
                 </div>
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6">
                 <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.06em] text-gray-400">Metadados</h2>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">JSON</label>
@@ -310,7 +310,7 @@ export default function BlogForm({ initialData }: Props) {
             </div>
 
             <div className="space-y-6">
-              <div className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-sm font-bold uppercase tracking-[0.06em] text-gray-400">Conteudo HTML</h2>
                   <button
@@ -324,7 +324,7 @@ export default function BlogForm({ initialData }: Props) {
 
                 {preview ? (
                   <div
-                    className="prose max-w-none rounded-xl border border-gray-100 bg-white p-4 prose-headings:font-heading prose-headings:font-black prose-a:text-[#FF4D6D] prose-a:underline prose-a:underline-offset-2 prose-img:rounded-xl"
+                    className="blog-content max-w-none rounded-xl border border-gray-100 bg-white p-4"
                     dangerouslySetInnerHTML={{ __html: contentHtml }}
                   />
                 ) : (
@@ -344,7 +344,7 @@ export default function BlogForm({ initialData }: Props) {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-gray-200 bg-white p-6">
+              <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6">
                 <h2 className="mb-4 text-sm font-bold uppercase tracking-[0.06em] text-gray-400">Publicacao</h2>
                 <div>
                   <label className="mb-1.5 block text-sm font-medium text-gray-700">Status</label>
@@ -364,17 +364,17 @@ export default function BlogForm({ initialData }: Props) {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
+              <div className="grid gap-3 pt-2 sm:flex sm:justify-end">
                 <Link
                   href="/admin/blog"
-                  className="inline-flex h-11 items-center rounded-[10px] border border-gray-200 px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                  className="inline-flex h-11 items-center justify-center rounded-[10px] border border-gray-200 px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                 >
                   Cancelar
                 </Link>
                 <button
                   type="submit"
                   disabled={loading || !!metadataError}
-                  className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[#FF4D6D] px-6 text-sm font-semibold text-white transition hover:bg-[#FF2D55] disabled:opacity-50"
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#FF4D6D] px-6 text-sm font-semibold text-white transition hover:bg-[#FF2D55] disabled:opacity-50"
                 >
                   {loading ? "Salvando..." : "Salvar"}
                 </button>

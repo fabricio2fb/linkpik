@@ -95,14 +95,14 @@ export default async function AdminCreatorDetailPage(props: { params: Promise<{ 
   }))
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
-      <header className="flex items-center justify-between gap-4">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
+      <header className="grid gap-4 sm:flex sm:items-center sm:justify-between">
         <div>
           <Link href="/admin/criadores" className="text-sm font-semibold text-[#FF4D6D] hover:underline">&larr; Criadores</Link>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900">{creator.name || creator.username}</h1>
-          <p className="text-sm text-gray-500">@{creator.username}</p>
+          <h1 className="mt-1 break-words text-2xl font-bold text-gray-900">{creator.name || creator.username}</h1>
+          <p className="break-all text-sm text-gray-500">@{creator.username}</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {creator.suspended ? <Badge tone="danger">Suspenso</Badge> : <Badge tone="success">Ativo</Badge>}
           {creator.plan === "pro" ? <Badge tone="accent">Pro</Badge> : <Badge tone="neutral">Free</Badge>}
         </div>
@@ -115,20 +115,20 @@ export default async function AdminCreatorDetailPage(props: { params: Promise<{ 
             <img src={creator.avatar_url} alt="" className="size-16 rounded-full object-cover" />
           )}
           <p className="text-sm text-gray-600"><span className="font-semibold">Bio:</span> {creator.bio || "—"}</p>
-          <p className="text-sm text-gray-600">
+          <p className="break-words text-sm text-gray-600">
             <span className="font-semibold">Loja:</span>{" "}
-            <a href={`/${creator.username}`} target="_blank" rel="noopener noreferrer" className="text-[#FF4D6D] hover:underline">
+            <a href={`/${creator.username}`} target="_blank" rel="noopener noreferrer" className="break-all text-[#FF4D6D] hover:underline">
               pik.bio/{creator.username} &nearr;
             </a>
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="break-words text-sm text-gray-600">
             <span className="font-semibold">E-mail:</span> {maskEmail(creatorEmail) || "—"}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="break-words text-sm text-gray-600">
             <span className="font-semibold">Cadastro:</span>{" "}
             {new Date(creator.created_at).toLocaleDateString("pt-BR")}
           </p>
-          <p className="text-sm text-gray-600">
+          <p className="break-words text-sm text-gray-600">
             <span className="font-semibold">Plano:</span> {creator.plan === "pro" ? "Pro" : "Free"}
           </p>
         </Card>
@@ -180,17 +180,17 @@ export default async function AdminCreatorDetailPage(props: { params: Promise<{ 
           <Card className="overflow-hidden">
             <div className="divide-y divide-gray-100">
               {auditLogs.map((log) => (
-                <div key={log.id} className="flex items-start justify-between gap-4 px-5 py-3 text-sm">
-                  <div>
-                    <span className="font-semibold text-gray-900">{log.action}</span>
+                <div key={log.id} className="grid gap-3 px-4 py-3 text-sm sm:flex sm:items-start sm:justify-between sm:gap-4 sm:px-5">
+                  <div className="min-w-0">
+                    <span className="break-words font-semibold text-gray-900">{log.action}</span>
                     {log.metadata && Object.keys(log.metadata as Record<string, unknown>).length > 0 && (
-                      <span className="ml-2 text-xs text-gray-400">
+                      <span className="mt-1 block break-all text-xs text-gray-400 sm:ml-2 sm:mt-0 sm:inline">
                         {JSON.stringify(log.metadata)}
                       </span>
                     )}
                   </div>
-                  <div className="shrink-0 text-right text-xs text-gray-400">
-                    <div>{log.admin_email}</div>
+                  <div className="shrink-0 text-left text-xs text-gray-400 sm:text-right">
+                    <div className="break-all">{log.admin_email}</div>
                     <div>{new Date(log.created_at).toLocaleString("pt-BR")}</div>
                   </div>
                 </div>
@@ -207,7 +207,7 @@ export default async function AdminCreatorDetailPage(props: { params: Promise<{ 
 
 function SettingsField({ label, value }: { label: string; value: string | null | undefined }) {
   return (
-    <div className="flex items-center justify-between gap-4 text-sm">
+    <div className="grid gap-1 text-sm sm:flex sm:items-center sm:justify-between sm:gap-4">
       <span className="font-semibold text-gray-700">{label}</span>
       <span className="text-gray-600">{value || "—"}</span>
     </div>

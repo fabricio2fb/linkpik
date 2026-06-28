@@ -100,7 +100,7 @@ export default async function AdminCriadoresPage(props: {
   ]
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
       <header>
         <h1 className="text-2xl font-bold text-gray-900">Criadores</h1>
         <p className="mt-1 text-sm text-gray-500">{total ?? 0} criadores cadastrados</p>
@@ -133,11 +133,11 @@ export default async function AdminCriadoresPage(props: {
               ))}
             </select>
           </label>
-          <div className="flex items-end gap-2">
-            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
+          <div className="grid gap-2 sm:flex sm:items-end">
+            <button type="submit" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
               Filtrar
             </button>
-            <Link href="/admin/criadores" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link href="/admin/criadores" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
               Limpar
             </Link>
           </div>
@@ -159,7 +159,7 @@ export default async function AdminCriadoresPage(props: {
       />
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-start gap-2 overflow-x-auto pb-1 sm:justify-center">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
             const params = new URLSearchParams()
             if (q) params.set("q", q)

@@ -68,7 +68,7 @@ export default function PrivacyConfirmModal({ requestId, email, requestType, use
         onClose={() => { setOpen(false); setTypedEmail("") }}
         maxWidth="max-w-md"
       >
-        <div className="space-y-4 p-5">
+        <div className="space-y-4 p-4 sm:p-5">
           <div className={`rounded-xl p-4 text-sm ${
             isDelete
               ? "border border-red-200 bg-red-50 text-red-800"
@@ -88,7 +88,7 @@ export default function PrivacyConfirmModal({ requestId, email, requestType, use
 
           <div className="text-sm text-gray-700">
             <p className="font-medium">Digite o email abaixo para confirmar:</p>
-            <p className="mt-1 font-mono text-sm font-bold text-[#FF4D6D]">{email}</p>
+            <p className="mt-1 break-all font-mono text-sm font-bold text-[#FF4D6D]">{email}</p>
           </div>
 
           <input
@@ -100,7 +100,7 @@ export default function PrivacyConfirmModal({ requestId, email, requestType, use
             autoComplete="off"
           />
 
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="grid gap-3 pt-2 sm:flex sm:justify-end">
             <Button
               type="button"
               variant="secondary"

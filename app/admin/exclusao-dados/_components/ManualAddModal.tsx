@@ -39,9 +39,9 @@ export default function ManualAddModal() {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Adicionar pedido manual</Button>
+      <Button className="w-full sm:w-auto" onClick={() => setOpen(true)}>Adicionar pedido manual</Button>
       <Modal open={open} title="Adicionar pedido manual" onClose={() => setOpen(false)}>
-        <form onSubmit={handleSubmit} className="space-y-4 p-5">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 sm:p-5">
           <Input
             label="Email do usuario"
             type="email"
@@ -71,7 +71,7 @@ export default function ManualAddModal() {
               <option value="export">Exportacao</option>
             </select>
           </label>
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="grid gap-3 pt-2 sm:flex sm:justify-end">
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>Cancelar</Button>
             <Button type="submit" loading={loading}>Criar pedido</Button>
           </div>

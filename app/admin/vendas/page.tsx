@@ -173,7 +173,7 @@ export default async function AdminVendasPage(props: {
   })
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
       <header>
         <h1 className="text-2xl font-bold text-gray-900">Vendas</h1>
         <p className="mt-1 text-sm text-gray-500">{total ?? 0} pedidos no total</p>
@@ -214,17 +214,17 @@ export default async function AdminVendasPage(props: {
               ))}
             </select>
           </label>
-          <div className="flex items-end gap-2">
-            <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
+          <div className="grid gap-2 sm:flex sm:items-end">
+            <button type="submit" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
               Filtrar
             </button>
-            <Link href="/admin/vendas" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link href="/admin/vendas" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
               Limpar
             </Link>
           </div>
         </form>
         {(startDate || endDate) && (
-          <div className="mt-3 flex flex-wrap items-center gap-3">
+          <div className="mt-3 grid gap-3 sm:flex sm:flex-wrap sm:items-center">
             <label className="grid gap-1 text-sm font-medium text-gray-700">
               <span>Data inicio</span>
               <input name="start_date" type="date" defaultValue={startDate} className="input-base h-11 px-3" />
@@ -233,7 +233,7 @@ export default async function AdminVendasPage(props: {
               <span>Data fim</span>
               <input name="end_date" type="date" defaultValue={endDate} className="input-base h-11 px-3" />
             </label>
-            <button type="submit" className="mt-5 inline-flex h-11 items-center gap-2 rounded-[10px] bg-gray-100 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-200">
+            <button type="submit" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-gray-100 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-200 sm:mt-5">
               Aplicar datas
             </button>
           </div>
@@ -243,7 +243,7 @@ export default async function AdminVendasPage(props: {
       <DataTable columns={columns} rows={rows} />
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-start gap-2 overflow-x-auto pb-1 sm:justify-center">
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => {
             const params = new URLSearchParams()
             if (q) params.set("q", q)

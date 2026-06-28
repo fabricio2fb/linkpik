@@ -74,10 +74,10 @@ function Header() {
           <a href="#precos" className="transition hover:text-white">Preços</a>
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/login" className="hidden rounded-full px-4 py-2 text-sm font-bold text-white/58 transition hover:text-white sm:block">
+          <Link href="/login" className="rounded-full px-2.5 py-2 text-sm font-bold text-white/58 transition hover:text-white sm:px-4">
             Entrar
           </Link>
-          <Link href="/registro" className="inline-flex h-10 items-center justify-center rounded-full bg-[#FF4D6D] px-5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-[#ff2d55]">
+          <Link href="/registro" className="inline-flex h-10 items-center justify-center rounded-full bg-[#FF4D6D] px-3.5 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-[#ff2d55] sm:px-5">
             Criar loja
           </Link>
         </div>

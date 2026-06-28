@@ -70,7 +70,7 @@ export default function AdminGrowthChart({ data = [] }: { data?: GrowthPoint[] }
   if (!data.length) {
     return (
       <Card className="p-5">
-        <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-3 sm:flex sm:items-center sm:justify-between">
           <div>
             <h2 className="font-heading text-lg font-bold text-[var(--text-primary)]">Crescimento</h2>
             <p className="text-sm text-[var(--text-secondary)]">Ultimos 6 meses</p>
@@ -83,12 +83,12 @@ export default function AdminGrowthChart({ data = [] }: { data?: GrowthPoint[] }
 
   return (
     <Card className="p-5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="grid gap-3 sm:flex sm:items-center sm:justify-between">
         <div>
           <h2 className="font-heading text-lg font-bold text-[var(--text-primary)]">Crescimento</h2>
           <p className="text-sm text-[var(--text-secondary)]">Ultimos 6 meses</p>
         </div>
-        <div className="flex items-center gap-4 text-xs font-semibold">
+        <div className="flex flex-wrap items-center gap-4 text-xs font-semibold">
           <span className="inline-flex items-center gap-1.5">
             <span className="size-2.5 rounded-sm bg-[#FF4D6D]" />
             Criadores

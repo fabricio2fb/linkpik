@@ -6,16 +6,18 @@ import { FEATURE_PHYSICAL_PRODUCT } from "@/lib/feature-flags";
 export async function getDashboardPaymentStatus(creatorId?: string) {
   const creator = creatorId ? null : await getCreatorContext();
   const supabase = createSupabaseService();
-  const { data: account } = await supabase
+  const { data: accounts } = await supabase
     .from("creator_marketplace_accounts")
-    .select("status, connected_at")
+    .select("gateway, status, connected_at")
     .eq("creator_id", creatorId ?? creator!.creatorId)
-    .eq("gateway", "mercadopago")
-    .maybeSingle();
+    .eq("status", "active");
+
+  const activeAccount = accounts?.[0];
 
   return {
-    status: account?.status === "active" ? "active" : "pending",
-    connected_at: account?.connected_at ?? null,
+    status: activeAccount ? "active" : "pending",
+    gateway: activeAccount?.gateway ?? null,
+    connected_at: activeAccount?.connected_at ?? null,
   };
 }
 

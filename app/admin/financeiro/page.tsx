@@ -142,15 +142,15 @@ export default async function AdminFinanceiroPage(props: {
     : `${activePro} criadores com plan=pro (fallback: sem tabela de assinaturas)`
 
   return (
-    <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
+    <div className="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:py-8">
       <header>
         <h1 className="text-2xl font-bold text-gray-900">Financeiro</h1>
         <p className="mt-1 text-sm text-gray-500">Receitas da plataforma</p>
       </header>
 
       <Card className="p-4">
-        <form className="flex flex-wrap items-end gap-3">
-          <label className="grid gap-1 text-sm font-medium text-gray-700">
+        <form className="grid gap-3 sm:flex sm:flex-wrap sm:items-end">
+          <label className="grid gap-1 text-sm font-medium text-gray-700 sm:min-w-56">
             <span>Periodo</span>
             <select name="period" defaultValue={period} className="input-base h-11 px-3">
               {PERIOD_OPTIONS.map((o) => (
@@ -158,16 +158,16 @@ export default async function AdminFinanceiroPage(props: {
               ))}
             </select>
           </label>
-          <button type="submit" className="inline-flex h-11 items-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
+          <button type="submit" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] bg-[#FF4D6D] px-4 text-sm font-semibold text-white hover:bg-[#FF2D55]">
             Aplicar
           </button>
-          <Link href="/admin/financeiro" className="inline-flex h-11 items-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+          <Link href="/admin/financeiro" className="inline-flex h-11 items-center justify-center gap-2 rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
             Limpar
           </Link>
         </form>
       </Card>
 
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           label="Taxa Free (10%)"
           value={formatPrice(feeFree)}

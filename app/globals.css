@@ -545,6 +545,108 @@ button:disabled {
 /*  These live in globals.css so Tailwind's purge never strips them.   */
 /* ------------------------------------------------------------------ */
 
+.blog-content {
+  color: #1f2937;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+}
+
+.blog-content > *:first-child {
+  margin-top: 0;
+}
+
+.blog-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.blog-content p,
+.blog-content ul,
+.blog-content ol,
+.blog-content blockquote,
+.blog-content pre,
+.blog-content table,
+.blog-content figure {
+  margin: 1.15rem 0;
+}
+
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  margin: 2rem 0 0.75rem;
+  color: #111827;
+  font-family: var(--font-plus-jakarta), sans-serif;
+  font-weight: 900;
+  line-height: 1.18;
+}
+
+.blog-content h2 {
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+}
+
+.blog-content h3 {
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+}
+
+.blog-content h4 {
+  font-size: 1.15rem;
+}
+
+.blog-content a {
+  color: #ff4d6d;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-content strong,
+.blog-content b {
+  color: #111827;
+  font-weight: 800;
+}
+
+.blog-content ul,
+.blog-content ol {
+  padding-left: 1.5rem;
+}
+
+.blog-content li {
+  margin: 0.35rem 0;
+}
+
+.blog-content blockquote {
+  border-left: 4px solid rgba(255, 77, 109, 0.45);
+  color: #4b5563;
+  padding-left: 1rem;
+}
+
+.blog-content img {
+  height: auto;
+  max-width: 100%;
+  border-radius: 16px;
+}
+
+.blog-content code {
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.07);
+  padding: 0.15rem 0.35rem;
+  color: #be123c;
+  font-size: 0.9em;
+}
+
+.blog-content pre {
+  overflow-x: auto;
+  border-radius: 14px;
+  background: #111827;
+  padding: 1rem;
+  color: #f9fafb;
+}
+
+.blog-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
 .blog-badge {
   display: inline-block;
   border-radius: 999px;

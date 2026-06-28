@@ -58,7 +58,7 @@ export default function MrrChart({ data = [] }: { data?: MrrPoint[] }) {
   if (!data.length) {
     return (
       <Card className="p-5">
-        <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-3 sm:flex sm:items-center sm:justify-between">
           <div>
             <h2 className="font-heading text-lg font-bold text-[var(--text-primary)]">MRR</h2>
             <p className="text-sm text-[var(--text-secondary)]">Evolucao da receita recorrente</p>
@@ -71,7 +71,7 @@ export default function MrrChart({ data = [] }: { data?: MrrPoint[] }) {
 
   return (
     <Card className="p-5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="grid gap-3 sm:flex sm:items-center sm:justify-between">
         <div>
           <h2 className="font-heading text-lg font-bold text-[var(--text-primary)]">MRR</h2>
           <p className="text-sm text-[var(--text-secondary)]">Evolucao da receita recorrente (ultimos 6 meses)</p>
