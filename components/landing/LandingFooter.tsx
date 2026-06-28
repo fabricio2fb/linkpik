@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Facebook, Instagram, Music2 } from "lucide-react";
+import { Instagram, Music2 } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
 
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
@@ -28,7 +28,6 @@ export default function LandingFooter() {
             <div className="mt-5 flex gap-3 text-white/40">
               <Instagram size={18} />
               <Music2 size={18} />
-              <Facebook size={18} />
             </div>
           </div>
           <div>
