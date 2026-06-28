@@ -14,6 +14,7 @@ import { createNotification } from "@/lib/api/notifier";
 import { addTrackingEvent, createPublicOrderStatusToken, publicStatusUrl } from "@/lib/api/physical-orders";
 import { err, ok } from "@/lib/api/response";
 import { createSupabaseService } from "@/lib/api/supabase-service";
+import { centavosToReais } from "@/lib/utils";
 
 function extractPaymentId(payload: Record<string, unknown>, requestUrl: string) {
   const url = new URL(requestUrl);
@@ -87,9 +88,13 @@ export async function POST(request: Request) {
 
       const { data: subscription } = await supabase
         .from("creator_subscriptions")
-        .select("id, plan_slug")
+        .select("id, plan_slug, status")
         .eq("mercado_pago_preapproval_id", preapproval.id)
         .maybeSingle();
+
+      const keepPendingExpiration =
+        subscription?.status === "cancelled_pending_expiration" &&
+        preapproval.status === "cancelled";
 
       const { data: savedSubscription, error: subscriptionError } = await supabase
         .from("creator_subscriptions")
@@ -100,7 +105,7 @@ export async function POST(request: Request) {
           mercado_pago_preapproval_id: preapproval.id,
           payer_email: preapproval.payer_email ?? null,
           plan_slug: subscription?.plan_slug ?? "pro",
-          status: preapproval.status,
+          status: keepPendingExpiration ? "cancelled_pending_expiration" : preapproval.status,
           amount: preapproval.auto_recurring?.transaction_amount ?? 0,
           currency: preapproval.auto_recurring?.currency_id ?? "BRL",
           frequency: preapproval.auto_recurring?.frequency ?? 1,
@@ -113,14 +118,16 @@ export async function POST(request: Request) {
 
       if (subscriptionError || !savedSubscription) throw new ApiError(500, "Erro ao salvar assinatura");
 
-      const nextStatus = await applyCreatorSubscriptionStatus({
-        creatorId,
-        subscriptionId: savedSubscription.id,
-        preapprovalId: preapproval.id,
-        status: preapproval.status,
-        planSlug: savedSubscription.plan_slug,
-        nextPaymentDate: preapproval.next_payment_date ?? null,
-      });
+      const nextStatus = keepPendingExpiration
+        ? "cancelled_pending_expiration"
+        : await applyCreatorSubscriptionStatus({
+            creatorId,
+            subscriptionId: savedSubscription.id,
+            preapprovalId: preapproval.id,
+            status: preapproval.status,
+            planSlug: savedSubscription.plan_slug,
+            nextPaymentDate: preapproval.next_payment_date ?? null,
+          });
 
       await supabase.from("payment_events").update({
         creator_id: creatorId,
@@ -168,7 +175,8 @@ export async function POST(request: Request) {
     const nextStatus = mapMercadoPagoStatus(payment.status);
     if (nextStatus === "paid") {
       const paidAmount = Number(payment.transaction_amount ?? payment.transaction_details?.total_paid_amount ?? 0);
-      if (Math.abs(paidAmount - Number(order.amount ?? 0)) > 0.01) {
+      const expectedAmount = centavosToReais(Number(order.amount ?? 0));
+      if (Math.abs(paidAmount - expectedAmount) > 0.01) {
         throw new ApiError(400, "Valor pago divergente do pedido");
       }
       const currency = String(payment.currency_id ?? "BRL");

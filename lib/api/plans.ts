@@ -13,7 +13,7 @@ export const PLAN_LIMITS = {
     custom_domain: true,
     analytics_days: 90,
     upsell: true,
-    marketplace_fee: 0.07,
+    marketplace_fee: 0.05,
   },
 } as const;
 

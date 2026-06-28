@@ -166,6 +166,25 @@ export default function ConfiguracoesPage() {
     if (session?.email) setEmail(session.email);
   }, [session?.email]);
 
+  useEffect(() => {
+    if (activeSection !== "plan") return;
+    let cancelled = false;
+
+    fetch("/api/subscriptions/mercadopago/status", {
+      method: "POST",
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((payload) => {
+        if (!cancelled && payload.data) setBilling(payload.data);
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSection]);
+
   function showToast(message: string) {
     setToast(message);
     window.setTimeout(() => setToast(null), 2200);

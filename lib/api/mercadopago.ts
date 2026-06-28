@@ -375,6 +375,7 @@ export function mapMercadoPagoStatus(status: string) {
 }
 
 export function mapMercadoPagoSubscriptionStatus(status: string) {
+  if (status === "cancelled_pending_expiration") return "cancelled_pending_expiration";
   if (status === "authorized" || status === "active") return "active";
   if (status === "pending") return "pending";
   if (status === "paused") return "paused";
@@ -448,6 +449,92 @@ export async function cancelMercadoPagoPreapproval(preapprovalId: string) {
     method: "PUT",
     body: JSON.stringify({ status: "cancelled" }),
   });
+}
+
+function addMonths(date: Date, months: number) {
+  const next = new Date(date);
+  next.setMonth(next.getMonth() + months);
+  return next;
+}
+
+function fallbackPeriodEnd(params: {
+  nextPaymentDate?: string | null;
+  lastPaymentDate?: string | null;
+  startedAt?: string | null;
+  createdAt?: string | null;
+  frequency?: number | null;
+}) {
+  if (params.nextPaymentDate) return params.nextPaymentDate;
+  const base = params.lastPaymentDate ?? params.startedAt ?? params.createdAt;
+  const baseDate = base ? new Date(base) : new Date();
+  return addMonths(baseDate, params.frequency ?? 1).toISOString();
+}
+
+export async function markCreatorSubscriptionCancellationPending(params: {
+  creatorId: string;
+  subscriptionId: string;
+  preapprovalId: string;
+  nextPaymentDate?: string | null;
+  lastPaymentDate?: string | null;
+  startedAt?: string | null;
+  createdAt?: string | null;
+  frequency?: number | null;
+}) {
+  const now = new Date().toISOString();
+  const periodEnd = fallbackPeriodEnd(params);
+  const supabase = createSupabaseService();
+
+  await supabase
+    .from("creator_subscriptions")
+    .update({
+      status: "cancelled_pending_expiration",
+      canceled_at: now,
+      next_payment_date: periodEnd,
+    })
+    .eq("id", params.subscriptionId)
+    .eq("mercado_pago_preapproval_id", params.preapprovalId);
+
+  await supabase
+    .from("creators")
+    .update({
+      plan: "pro",
+      plan_expires_at: periodEnd,
+    })
+    .eq("id", params.creatorId);
+
+  return { status: "cancelled_pending_expiration", periodEnd };
+}
+
+export async function expirePendingCancellationSubscriptions(now = new Date()) {
+  const supabase = createSupabaseService();
+  const { data: subscriptions, error } = await supabase
+    .from("creator_subscriptions")
+    .select("id, creator_id")
+    .eq("status", "cancelled_pending_expiration")
+    .lte("next_payment_date", now.toISOString());
+
+  if (error) throw new ApiError(500, "Erro ao buscar assinaturas expiradas");
+  const rows = subscriptions ?? [];
+  if (!rows.length) return { expired: 0 };
+
+  const subscriptionIds = rows.map((subscription) => subscription.id);
+  const creatorIds = [...new Set(rows.map((subscription) => subscription.creator_id))];
+
+  const { error: subscriptionError } = await supabase
+    .from("creator_subscriptions")
+    .update({ status: "cancelled" })
+    .in("id", subscriptionIds);
+
+  if (subscriptionError) throw new ApiError(500, "Erro ao expirar assinaturas");
+
+  const { error: creatorError } = await supabase
+    .from("creators")
+    .update({ plan: "free", plan_expires_at: null })
+    .in("id", creatorIds);
+
+  if (creatorError) throw new ApiError(500, "Erro ao atualizar planos expirados");
+
+  return { expired: rows.length };
 }
 
 export async function applyCreatorSubscriptionStatus(params: {
