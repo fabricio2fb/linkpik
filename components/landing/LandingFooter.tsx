@@ -47,10 +47,6 @@ export default function LandingFooter() {
             { label: "Contato", href: "/contato" },
           ]} />
         </div>
-        <div className="mt-10 flex flex-col gap-3 border-t border-white/[0.06] pt-6 text-sm text-white/34 sm:flex-row sm:items-center sm:justify-between">
-          <p>2026 Pikbio. Feito no Brasil.</p>
-          <p>Mercado Pago. Seguro. Sem mensalidade para comecar.</p>
-        </div>
       </div>
     </footer>
   );
