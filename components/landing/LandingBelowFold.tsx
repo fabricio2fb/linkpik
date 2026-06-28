@@ -7,7 +7,6 @@ import {
   BarChart3,
   Check,
   ChevronDown,
-  Facebook,
   Instagram,
   MousePointerClick,
   Music2,
@@ -249,9 +248,8 @@ export default function LandingBelowFold() {
               <BrandLogo imageClassName="size-9" textClassName="text-2xl text-white" />
               <p className="mt-4 max-w-sm text-sm leading-7 text-white/44">Loja na bio para criadores brasileiros venderem produtos digitais com Mercado Pago, upsell e entrega automatica.</p>
               <div className="mt-5 flex gap-3 text-white/40">
-                <Instagram size={18} />
-                <Music2 size={18} />
-                <Facebook size={18} />
+                <a href="https://www.instagram.com/pikbio.app/" target="_blank" rel="noopener noreferrer" className="transition hover:text-white"><Instagram size={18} /></a>
+                <a href="https://tiktok.com/@pikbio" target="_blank" rel="noopener noreferrer" className="transition hover:text-white"><Music2 size={18} /></a>
               </div>
             </div>
             <div>
