@@ -54,6 +54,7 @@ export async function createCustomHostname(domain: string) {
       ssl: { method: "http", type: "dv" },
     }),
   });
+  console.error("Cloudflare createCustomHostname response:", JSON.stringify(result, null, 2));
   return result as CloudflareHostnameResult;
 }
 
@@ -61,6 +62,16 @@ export async function getCustomHostname(hostnameId: string) {
   const { zoneId } = getConfig();
   const result = await cfFetch(`/zones/${zoneId}/custom_hostnames/${hostnameId}`);
   return result as CloudflareHostnameResult;
+}
+
+export async function getFallbackOrigin() {
+  const { zoneId } = getConfig();
+  try {
+    const result = await cfFetch(`/zones/${zoneId}/custom_hostnames/fallback_origin`);
+    return (result as { origin: string }).origin;
+  } catch {
+    return "";
+  }
 }
 
 export async function deleteCustomHostname(hostnameId: string) {
@@ -76,8 +87,17 @@ export async function findCustomHostnameByDomain(domain: string) {
   return list.find((h) => h.hostname.toLowerCase() === lower) ?? null;
 }
 
-export function getDnsInstructions(domain: string) {
-  return [
-    { type: "CNAME", name: domain, value: "pik.bio", ttl: "Auto" },
-  ];
+export async function getFallbackCnameTarget() {
+  try {
+    const origin = await getFallbackOrigin();
+    if (!origin) return "pik.bio";
+    const hostname = origin.replace(/^https?:\/\//, "").split("/")[0];
+    if (hostname) {
+      console.error("Cloudflare fallback origin resolved to:", hostname);
+      return hostname;
+    }
+  } catch {
+    // fallback abaixo
+  }
+  return "pik.bio";
 }

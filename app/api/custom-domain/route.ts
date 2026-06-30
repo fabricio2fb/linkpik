@@ -6,7 +6,7 @@ import { getPlanLimits } from "@/lib/api/plans";
 import { err, ok } from "@/lib/api/response";
 import { createSupabaseServer } from "@/lib/api/supabase-server";
 import { createSupabaseService } from "@/lib/api/supabase-service";
-import { createCustomHostname, deleteCustomHostname, findCustomHostnameByDomain, getCustomHostname } from "@/lib/api/cloudflare-hostnames";
+import { createCustomHostname, deleteCustomHostname, findCustomHostnameByDomain, getCustomHostname, getFallbackCnameTarget } from "@/lib/api/cloudflare-hostnames";
 
 const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/;
 
@@ -97,12 +97,15 @@ export async function POST(req: NextRequest) {
       throw new ApiError(500, "Erro ao salvar dominio no banco de dados");
     }
 
+    const cnameTarget = await getFallbackCnameTarget();
+
     return ok({
       domain,
       hostnameId: hostname.id,
       status: hostname.status,
       sslStatus: hostname.ssl?.status ?? null,
       ownershipVerification: hostname.ownership_verification ?? null,
+      cnameTarget,
     });
   } catch (e) {
     return err(e);
@@ -143,11 +146,14 @@ export async function GET() {
       // Cloudflare API indisponivel, retorna o que temos no banco
     }
 
+    const cnameTarget = await getFallbackCnameTarget();
+
     return ok({
       domain: settings.custom_domain,
       hostnameId: settings.cloudflare_hostname_id,
       status: cfStatus,
       sslStatus: cfSslStatus,
+      cnameTarget,
     });
   } catch (e) {
     return err(e);

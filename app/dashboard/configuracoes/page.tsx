@@ -117,7 +117,8 @@ export default function ConfiguracoesPage() {
     hostnameId: string | null;
     status: string | null;
     sslStatus: string | null;
-  }>({ domain: null, hostnameId: null, status: null, sslStatus: null });
+    cnameTarget: string | null;
+  }>({ domain: null, hostnameId: null, status: null, sslStatus: null, cnameTarget: null });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -782,7 +783,7 @@ export default function ConfiguracoesPage() {
                       <tr className="font-mono text-[var(--text-primary)]">
                         <td className="py-1 pr-4">CNAME</td>
                         <td className="py-1 pr-4">{domainState.domain}</td>
-                        <td className="py-1 pr-4">pik.bio</td>
+                        <td className="py-1 pr-4">{domainState.cnameTarget || "pik.bio"}</td>
                         <td className="py-1 text-[var(--text-tertiary)]">Automatico (padrao)</td>
                       </tr>
                     </tbody>
@@ -840,7 +841,7 @@ export default function ConfiguracoesPage() {
                             await fetch("/api/custom-domain", { method: "DELETE", credentials: "include" });
                             setSaving(null);
                             setDomainRemoveConfirm(false);
-                            setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null });
+                            setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null, cnameTarget: null });
                             setDomainInput("");
                             showToast("Dominio removido");
                           }}
