@@ -67,6 +67,13 @@ export async function deleteCustomHostname(hostnameId: string) {
   await cfFetch(`/zones/${zoneId}/custom_hostnames/${hostnameId}`, { method: "DELETE" });
 }
 
+export async function findCustomHostnameByDomain(domain: string) {
+  const { zoneId } = getConfig();
+  const result = await cfFetch(`/zones/${zoneId}/custom_hostnames?hostname=${encodeURIComponent(domain)}`);
+  const list = result as CloudflareHostnameResult[];
+  return list.find((h) => h.hostname === domain) ?? null;
+}
+
 export function getDnsInstructions(domain: string) {
   return [
     { type: "CNAME", name: domain, value: "pik.bio", ttl: "Auto" },

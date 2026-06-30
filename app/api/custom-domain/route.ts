@@ -6,7 +6,7 @@ import { getPlanLimits } from "@/lib/api/plans";
 import { err, ok } from "@/lib/api/response";
 import { createSupabaseServer } from "@/lib/api/supabase-server";
 import { createSupabaseService } from "@/lib/api/supabase-service";
-import { createCustomHostname, deleteCustomHostname, getCustomHostname } from "@/lib/api/cloudflare-hostnames";
+import { createCustomHostname, deleteCustomHostname, findCustomHostnameByDomain, getCustomHostname } from "@/lib/api/cloudflare-hostnames";
 
 const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,}$/;
 
@@ -55,7 +55,22 @@ export async function POST(req: NextRequest) {
       throw new ApiError(400, "Voce ja possui um dominio configurado. Remova-o primeiro.");
     }
 
-    const hostname = await createCustomHostname(domain);
+    let hostname;
+    try {
+      hostname = await createCustomHostname(domain);
+    } catch (createError) {
+      const isDuplicate = createError instanceof ApiError && (
+        createError.message.toLowerCase().includes("already exists") ||
+        createError.message.includes("1406")
+      );
+      if (!isDuplicate) throw createError;
+
+      const found = await findCustomHostnameByDomain(domain);
+      if (!found) {
+        throw new ApiError(502, "Dominio ja existe na Cloudflare mas nao foi possivel recupera-lo");
+      }
+      hostname = found;
+    }
 
     const serviceClient = createSupabaseService();
     const { data: saved, error: saveError } = await serviceClient
