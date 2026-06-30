@@ -5,7 +5,7 @@ import { FEATURE_PHYSICAL_PRODUCT } from "@/lib/feature-flags";
 
 const PUBLIC_ROUTES = ["/", "/login", "/registro", "/lojaexemplo", "/recuperar-senha"];
 const PUBLIC_API_PREFIXES = ["/api/public", "/api/webhooks", "/api/analytics/track", "/api/access"];
-const PUBLIC_API_EXACT = ["/api/auth/session", "/api/auth/register", "/api/auth/rate-check", "/api/orders", "/api/docs"];
+const PUBLIC_API_EXACT = ["/api/auth/session", "/api/auth/register", "/api/auth/rate-check", "/api/auth/callback", "/api/orders", "/api/docs"];
 const RESERVED_PUBLIC_SLUGS = new Set([
   "api",
   "dashboard",
