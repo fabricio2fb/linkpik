@@ -58,14 +58,20 @@ export async function POST(req: NextRequest) {
     const hostname = await createCustomHostname(domain);
 
     const serviceClient = createSupabaseService();
-    await serviceClient
+    const { data: saved, error: saveError } = await serviceClient
       .from("creator_settings")
-      .update({
+      .upsert({
+        creator_id: creator.id,
         custom_domain: domain,
         cloudflare_hostname_id: hostname.id,
         domain_verified: hostname.status === "active",
-      })
-      .eq("creator_id", creator.id);
+      }, { onConflict: "creator_id" })
+      .select("custom_domain, cloudflare_hostname_id, domain_verified")
+      .single();
+
+    if (saveError || !saved) {
+      throw new ApiError(500, "Erro ao salvar dominio no banco de dados");
+    }
 
     return ok({
       domain,
@@ -84,12 +90,12 @@ export async function GET() {
     const user = await getAuthUser();
     const { creator } = await getCreator(user.id);
 
-    const supabase = await createSupabaseServer();
+    const supabase = createSupabaseService();
     const { data: settings } = await supabase
       .from("creator_settings")
       .select("custom_domain, cloudflare_hostname_id, domain_verified")
       .eq("creator_id", creator.id)
-      .single();
+      .maybeSingle();
 
     if (!settings || !settings.custom_domain || !settings.cloudflare_hostname_id) {
       return ok({ domain: null, hostnameId: null, status: null, sslStatus: null });
@@ -104,7 +110,7 @@ export async function GET() {
       cfSslStatus = hostname.ssl?.status ?? null;
 
       if (hostname.status === "active" && !settings.domain_verified) {
-        await createSupabaseService()
+        await supabase
           .from("creator_settings")
           .update({ domain_verified: true })
           .eq("creator_id", creator.id);
@@ -129,12 +135,12 @@ export async function DELETE() {
     const user = await getAuthUser();
     const { creator } = await getCreator(user.id);
 
-    const supabase = await createSupabaseServer();
+    const supabase = createSupabaseService();
     const { data: settings } = await supabase
       .from("creator_settings")
       .select("cloudflare_hostname_id")
       .eq("creator_id", creator.id)
-      .single();
+      .maybeSingle();
 
     if (!settings?.cloudflare_hostname_id) {
       throw new ApiError(400, "Nenhum dominio configurado para remover");
@@ -146,8 +152,7 @@ export async function DELETE() {
       // Se ja foi deletado na Cloudflare, ignora erro
     }
 
-    const serviceClient = createSupabaseService();
-    await serviceClient
+    await supabase
       .from("creator_settings")
       .update({
         custom_domain: null,

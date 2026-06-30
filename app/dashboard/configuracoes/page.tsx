@@ -111,6 +111,7 @@ export default function ConfiguracoesPage() {
   const [avatarUploadError, setAvatarUploadError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [domainInput, setDomainInput] = useState("");
+  const [domainRemoveConfirm, setDomainRemoveConfirm] = useState(false);
   const [domainState, setDomainState] = useState<{
     domain: string | null;
     hostnameId: string | null;
@@ -139,9 +140,10 @@ export default function ConfiguracoesPage() {
       fetch("/api/creators/me/billing", { credentials: "include" }),
       fetch("/api/mercadopago/status", { credentials: "include" }),
       fetch("/api/efipay/status", { credentials: "include" }),
+      fetch("/api/custom-domain", { credentials: "include" }),
     ])
       .then((responses) => Promise.all(responses.map((response) => response.json())))
-      .then(([creatorPayload, settingsPayload, billingPayload, mercadoPagoPayload, efipayPayload]) => {
+      .then(([creatorPayload, settingsPayload, billingPayload, mercadoPagoPayload, efipayPayload, domainPayload]) => {
         setCreator({
           name: creatorPayload.data?.name ?? "",
           username: creatorPayload.data?.username ?? "",
@@ -165,6 +167,10 @@ export default function ConfiguracoesPage() {
           connected_at: efipayPayload.data?.connected_at ?? null,
           has_pix_key: Boolean(efipayPayload.data?.has_pix_key),
         });
+        if (domainPayload?.data?.hostnameId) {
+          setDomainState(domainPayload.data);
+          setDomainInput(domainPayload.data.domain ?? "");
+        }
       })
       .catch(() => showToast("Erro ao carregar configuracoes"));
   }, []);
@@ -718,15 +724,20 @@ export default function ConfiguracoesPage() {
                       <p className="text-sm font-bold text-[var(--text-primary)]">{domainState.domain}</p>
                       <div className="mt-2 flex items-center gap-2">
                         {domainState.status === "active" ? (
-                          <Badge tone="success">Ativo</Badge>
-                        ) : domainState.status === "verifying" ? (
-                          <Badge tone="warning">Verificando</Badge>
+                          <Badge tone="success">Conectado</Badge>
                         ) : (
-                          <Badge tone="neutral">Pendente</Badge>
+                          <Badge tone="warning">Aguardando configuracao de DNS</Badge>
                         )}
-                        <span className="text-xs text-[var(--text-secondary)]">
-                          SSL: {domainState.sslStatus ?? "pendente"}
-                        </span>
+                        {(() => {
+                          const ssl = (domainState.sslStatus ?? "").toLowerCase();
+                          if (ssl.includes("active")) {
+                            return <span className="text-xs text-[var(--text-secondary)]"><CheckCircle2 size={12} className="mr-1 inline text-green-400" />Certificado SSL: ativo</span>;
+                          }
+                          if (ssl.includes("initializing") || ssl.includes("pending")) {
+                            return <span className="text-xs text-[var(--text-secondary)]"><Zap size={12} className="mr-1 inline animate-pulse text-yellow-400" />Certificado SSL: gerando...</span>;
+                          }
+                          return <span className="text-xs text-[var(--text-secondary)]">Certificado SSL: pendente</span>;
+                        })()}
                       </div>
                     </div>
                     <Button
@@ -751,34 +762,95 @@ export default function ConfiguracoesPage() {
                 </div>
 
                 <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-                  <p className="text-sm font-bold text-[var(--text-primary)]">Instrucoes de DNS</p>
-                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
-                    Configure o CNAME abaixo no seu provedor de dominio.
-                  </p>
-                  <div className="mt-3 grid grid-cols-[auto_1fr_auto] gap-2 text-xs font-medium">
-                    <span className="text-[var(--text-secondary)]">Tipo</span>
-                    <span className="text-[var(--text-secondary)]">Nome</span>
-                    <span className="text-[var(--text-secondary)]">Valor</span>
-                    <span className="font-mono text-[var(--text-primary)]">CNAME</span>
-                    <span className="font-mono text-[var(--text-primary)]">{domainState.domain}</span>
-                    <span className="font-mono text-[var(--text-primary)]">pik.bio</span>
-                  </div>
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Como conectar seu dominio</p>
+                  <ol className="mt-4 list-inside list-decimal space-y-3 text-sm text-[var(--text-secondary)] [counter-reset:step]">
+                    <li className="[counter-increment:step]">Acesse o painel onde voce registrou o dominio (ex: Registro.br, GoDaddy, Namecheap, Hostinger).</li>
+                    <li className="[counter-increment:step]">Va ate a secao de DNS ou &quot;Gerenciar Zona DNS&quot;.</li>
+                    <li className="[counter-increment:step]">Se ja existir um registro do tipo A apontando para a raiz do dominio, remova-o primeiro (nao e possivel ter dois registros diferentes no mesmo nome).</li>
+                    <li className="[counter-increment:step]">Crie um novo registro com os dados abaixo:</li>
+                  </ol>
+                  <table className="mt-4 w-full border-collapse text-xs font-medium">
+                    <thead>
+                      <tr className="text-left text-[var(--text-tertiary)]">
+                        <th className="pb-1 pr-4">Tipo</th>
+                        <th className="pb-1 pr-4">Nome</th>
+                        <th className="pb-1 pr-4">Valor</th>
+                        <th className="pb-1">TTL</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="font-mono text-[var(--text-primary)]">
+                        <td className="py-1 pr-4">CNAME</td>
+                        <td className="py-1 pr-4">{domainState.domain}</td>
+                        <td className="py-1 pr-4">pik.bio</td>
+                        <td className="py-1 text-[var(--text-tertiary)]">Automatico (padrao)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <ol className="mt-4 list-inside list-decimal space-y-3 text-sm text-[var(--text-secondary)]" start={5}>
+                    <li>Salve e aguarde a propagacao (de 5 minutos a algumas horas).</li>
+                    <li>Clique em &quot;Verificar status&quot; abaixo.</li>
+                  </ol>
+                  {(() => {
+                    const cleanDomain = (domainState.domain ?? "").replace(/^www\./, "");
+                    const parts = cleanDomain.split(".");
+                    const isRoot = parts.length <= 2 || (parts.length === 3 && parts[2].length <= 3);
+                    if (!isRoot) return null;
+                    return (
+                      <div className="mt-4 flex gap-2.5 rounded-[6px] border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs leading-relaxed text-yellow-300">
+                        <AlertTriangle size={16} className="mt-0.5 shrink-0 text-yellow-400" />
+                        <span>
+                          Alguns provedores nao permitem CNAME na raiz do dominio. Se aparecer erro ao salvar, procure pela opcao <strong>ALIAS</strong> ou <strong>ANAME</strong> no lugar de CNAME &mdash; elas funcionam da mesma forma para dominios raiz (ex: seudominio.com). Se for um subdominio (ex: loja.seudominio.com), CNAME funciona normalmente em qualquer provedor.
+                        </span>
+                      </div>
+                    );
+                  })()}
                 </div>
 
-                <Button
-                  variant="secondary"
-                  loading={saving === "domain-remove"}
-                  onClick={async () => {
-                    setSaving("domain-remove");
-                    await fetch("/api/custom-domain", { method: "DELETE", credentials: "include" });
-                    setSaving(null);
-                    setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null });
-                    setDomainInput("");
-                    showToast("Dominio removido");
-                  }}
-                >
-                  Remover dominio
-                </Button>
+                <p className="text-xs text-[var(--text-tertiary)]">
+                  <Zap size={12} className="mr-1 inline text-yellow-400" />
+                  O certificado de seguranca (SSL) e emitido automaticamente apos a verificacao do DNS &mdash; pode levar alguns minutos extras.
+                </p>
+
+                <div>
+                  <Button
+                    variant="secondary"
+                    className="text-red-400 hover:text-red-300"
+                    onClick={() => setDomainRemoveConfirm(true)}
+                  >
+                    Remover dominio
+                  </Button>
+                  <Modal
+                    open={domainRemoveConfirm}
+                    onClose={() => setDomainRemoveConfirm(false)}
+                    title="Desconectar dominio"
+                    maxWidth="max-w-sm"
+                  >
+                    <div className="space-y-4 p-1 text-sm text-[var(--text-secondary)]">
+                      <div className="flex items-center gap-3 rounded-[6px] border border-red-500/20 bg-red-500/5 p-3">
+                        <AlertTriangle size={20} className="shrink-0 text-red-400" />
+                        <span>Tem certeza que deseja desconectar este dominio? A loja voltara a usar o endereco pik.bio/{creator?.username ?? "..."}.</span>
+                      </div>
+                      <div className="flex justify-end gap-2">
+                        <Button variant="secondary" onClick={() => setDomainRemoveConfirm(false)}>Cancelar</Button>
+                        <Button
+                          loading={saving === "domain-remove"}
+                          onClick={async () => {
+                            setSaving("domain-remove");
+                            await fetch("/api/custom-domain", { method: "DELETE", credentials: "include" });
+                            setSaving(null);
+                            setDomainRemoveConfirm(false);
+                            setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null });
+                            setDomainInput("");
+                            showToast("Dominio removido");
+                          }}
+                        >
+                          Sim, desconectar
+                        </Button>
+                      </div>
+                    </div>
+                  </Modal>
+                </div>
               </div>
             ) : (
               <div className="mt-5 space-y-4">
