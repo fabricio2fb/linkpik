@@ -59,9 +59,15 @@ export async function POST(req: NextRequest) {
     try {
       hostname = await createCustomHostname(domain);
     } catch (createError) {
+      console.error("POST /api/custom-domain — Cloudflare create error:", {
+        message: createError instanceof Error ? createError.message : String(createError),
+        status: createError instanceof ApiError ? createError.status : undefined,
+      });
       const isDuplicate = createError instanceof ApiError && (
         createError.message.toLowerCase().includes("already exists") ||
-        createError.message.includes("1406")
+        createError.message.includes("1406") ||
+        createError.message.includes("Duplicate custom hostname") ||
+        createError.status === 409
       );
       if (!isDuplicate) throw createError;
 
@@ -73,18 +79,21 @@ export async function POST(req: NextRequest) {
     }
 
     const serviceClient = createSupabaseService();
+    const upsertPayload = {
+      creator_id: creator.id,
+      custom_domain: domain,
+      cloudflare_hostname_id: hostname.id,
+      domain_verified: hostname.status === "active",
+    };
+    console.error("Upsert payload:", upsertPayload, "hostname keys:", Object.keys(hostname));
     const { data: saved, error: saveError } = await serviceClient
       .from("creator_settings")
-      .upsert({
-        creator_id: creator.id,
-        custom_domain: domain,
-        cloudflare_hostname_id: hostname.id,
-        domain_verified: hostname.status === "active",
-      }, { onConflict: "creator_id" })
+      .upsert(upsertPayload, { onConflict: "creator_id" })
       .select("custom_domain, cloudflare_hostname_id, domain_verified")
       .single();
 
     if (saveError || !saved) {
+      console.error("Supabase upsert error:", { error: saveError, saved, upsertPayload });
       throw new ApiError(500, "Erro ao salvar dominio no banco de dados");
     }
 

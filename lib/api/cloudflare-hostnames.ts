@@ -21,6 +21,7 @@ async function cfFetch(path: string, options: RequestInit = {}) {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok || !body.success) {
+    console.error("Cloudflare API error:", { status: response.status, body });
     const errors = (body.errors ?? []).map((e: { message: string }) => e.message).join("; ");
     throw new ApiError(502, errors || "Erro na API da Cloudflare");
   }
@@ -71,7 +72,8 @@ export async function findCustomHostnameByDomain(domain: string) {
   const { zoneId } = getConfig();
   const result = await cfFetch(`/zones/${zoneId}/custom_hostnames?hostname=${encodeURIComponent(domain)}`);
   const list = result as CloudflareHostnameResult[];
-  return list.find((h) => h.hostname === domain) ?? null;
+  const lower = domain.toLowerCase();
+  return list.find((h) => h.hostname.toLowerCase() === lower) ?? null;
 }
 
 export function getDnsInstructions(domain: string) {
