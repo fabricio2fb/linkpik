@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Bell, CheckCircle2, CreditCard, ExternalLink, Globe, ImagePlus, KeyRound, Link2, Lock, Mail, Save, User, X, Zap } from "lucide-react";
+import { AlertTriangle, Bell, CheckCircle2, CreditCard, ExternalLink, ImagePlus, KeyRound, Link2, Lock, Mail, Save, User, X, Zap } from "lucide-react";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -9,7 +9,7 @@ import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import { Input } from "@/components/ui/Input";
 import { uploadSignedCloudinaryImage, validateImageFile } from "@/lib/client/cloudinary-upload";
-import { FEATURE_CUSTOM_DOMAIN, FEATURE_WHATSAPP_NOTIFICATIONS } from "@/lib/feature-flags";
+import { FEATURE_WHATSAPP_NOTIFICATIONS } from "@/lib/feature-flags";
 import { useSession } from "@/lib/hooks/use-session";
 
 type Creator = {
@@ -44,8 +44,6 @@ type Settings = {
   webhook_url?: string | null;
   webhook_events?: string[];
   webhook_secret?: string | null;
-  custom_domain?: string | null;
-  domain_verified?: boolean;
   default_gateway?: PaymentGateway;
   default_payment_gateway?: PaymentGateway | null;
 };
@@ -63,7 +61,7 @@ type Billing = {
   } | null;
 };
 
-type SectionKey = "account" | "payments" | "notifications" | "integrations" | "domain" | "plan";
+type SectionKey = "account" | "payments" | "notifications" | "integrations" | "plan";
 type MercadoPagoStatus = {
   connected: boolean;
   status: "pending" | "active" | "disconnected" | "expired" | "error";
@@ -110,15 +108,6 @@ export default function ConfiguracoesPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
-  const [domainInput, setDomainInput] = useState("");
-  const [domainRemoveConfirm, setDomainRemoveConfirm] = useState(false);
-  const [domainState, setDomainState] = useState<{
-    domain: string | null;
-    hostnameId: string | null;
-    status: string | null;
-    sslStatus: string | null;
-    cnameTarget: string | null;
-  }>({ domain: null, hostnameId: null, status: null, sslStatus: null, cnameTarget: null });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -129,9 +118,6 @@ export default function ConfiguracoesPage() {
     if (tab === "plan" || section === "plan") setActiveSection("plan");
     if (tab === "notifications" || section === "notifications") setActiveSection("notifications");
     if (tab === "integrations" || section === "integrations") setActiveSection("integrations");
-    if (FEATURE_CUSTOM_DOMAIN && (tab === "domain" || section === "domain")) {
-      setActiveSection("domain");
-    }
   }, []);
 
   useEffect(() => {
@@ -141,10 +127,9 @@ export default function ConfiguracoesPage() {
       fetch("/api/creators/me/billing", { credentials: "include" }),
       fetch("/api/mercadopago/status", { credentials: "include" }),
       fetch("/api/efipay/status", { credentials: "include" }),
-      fetch("/api/custom-domain", { credentials: "include" }),
     ])
       .then((responses) => Promise.all(responses.map((response) => response.json())))
-      .then(([creatorPayload, settingsPayload, billingPayload, mercadoPagoPayload, efipayPayload, domainPayload]) => {
+      .then(([creatorPayload, settingsPayload, billingPayload, mercadoPagoPayload, efipayPayload]) => {
         setCreator({
           name: creatorPayload.data?.name ?? "",
           username: creatorPayload.data?.username ?? "",
@@ -168,10 +153,6 @@ export default function ConfiguracoesPage() {
           connected_at: efipayPayload.data?.connected_at ?? null,
           has_pix_key: Boolean(efipayPayload.data?.has_pix_key),
         });
-        if (domainPayload?.data?.hostnameId) {
-          setDomainState(domainPayload.data);
-          setDomainInput(domainPayload.data.domain ?? "");
-        }
       })
       .catch(() => showToast("Erro ao carregar configuracoes"));
   }, []);
@@ -197,19 +178,6 @@ export default function ConfiguracoesPage() {
     return () => {
       cancelled = true;
     };
-  }, [activeSection]);
-
-  useEffect(() => {
-    if (activeSection !== "domain") return;
-    fetch("/api/custom-domain", { credentials: "include" })
-      .then((response) => response.json())
-      .then((payload) => {
-        if (payload.data) {
-          setDomainState(payload.data);
-          setDomainInput(payload.data.domain ?? "");
-        }
-      })
-      .catch(() => undefined);
   }, [activeSection]);
 
   function showToast(message: string) {
@@ -386,15 +354,6 @@ export default function ConfiguracoesPage() {
       await disablePushNotifications();
     }
     setSettings((current) => ({ ...current, notify_push_enabled: checked }));
-  }
-
-  async function verifyDomain() {
-    setSaving("domain-verify");
-    const response = await fetch("/api/creators/me/domain/verify", { method: "POST", credentials: "include" });
-    const payload = await response.json().catch(() => ({}));
-    setSaving(null);
-    showToast(payload.data?.message ?? payload.error ?? "Verificacao concluida");
-    if (payload.data?.verified) setSettings((current) => ({ ...current, domain_verified: true }));
   }
 
   async function upgrade() {
@@ -712,205 +671,6 @@ export default function ConfiguracoesPage() {
         }, "Integracoes salvas", "integrations")}><Save size={16} />Salvar integracoes</Button>
       </Card>}
 
-      {FEATURE_CUSTOM_DOMAIN && activeSection === "domain" && (
-        billing?.is_pro ? (
-          <Card className="p-5">
-            <SectionTitle icon={Globe} title="Dominio" text="Dominio proprio para sua loja." />
-
-            {domainState.hostnameId ? (
-              <div className="mt-5 space-y-5">
-                <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-bold text-[var(--text-primary)]">{domainState.domain}</p>
-                      <div className="mt-2 flex items-center gap-2">
-                        {domainState.status === "active" ? (
-                          <Badge tone="success">Conectado</Badge>
-                        ) : (
-                          <Badge tone="warning">Aguardando configuracao de DNS</Badge>
-                        )}
-                        {(() => {
-                          const ssl = (domainState.sslStatus ?? "").toLowerCase();
-                          if (ssl.includes("active")) {
-                            return <span className="text-xs text-[var(--text-secondary)]"><CheckCircle2 size={12} className="mr-1 inline text-green-400" />Certificado SSL: ativo</span>;
-                          }
-                          if (ssl.includes("initializing") || ssl.includes("pending")) {
-                            return <span className="text-xs text-[var(--text-secondary)]"><Zap size={12} className="mr-1 inline animate-pulse text-yellow-400" />Certificado SSL: gerando...</span>;
-                          }
-                          return <span className="text-xs text-[var(--text-secondary)]">Certificado SSL: pendente</span>;
-                        })()}
-                      </div>
-                    </div>
-                    <Button
-                      variant="secondary"
-                      loading={saving === "domain-verify"}
-                      onClick={async () => {
-                        setSaving("domain-verify");
-                        const response = await fetch("/api/creators/me/domain/verify", { method: "POST", credentials: "include" });
-                        const payload = await response.json().catch(() => ({}));
-                        setSaving(null);
-                        if (payload.data?.verified) {
-                          setDomainState((current) => ({ ...current, status: "active" }));
-                          showToast("Dominio verificado!");
-                        } else {
-                          showToast(payload.data?.message ?? payload.error ?? "Aguardando configuracao de DNS");
-                        }
-                      }}
-                    >
-                      Verificar status
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-                  <p className="text-sm font-bold text-[var(--text-primary)]">Como conectar seu dominio</p>
-                  <ol className="mt-4 list-inside list-decimal space-y-3 text-sm text-[var(--text-secondary)] [counter-reset:step]">
-                    <li className="[counter-increment:step]">Acesse o painel onde voce registrou o dominio (ex: Registro.br, GoDaddy, Namecheap, Hostinger).</li>
-                    <li className="[counter-increment:step]">Va ate a secao de DNS ou &quot;Gerenciar Zona DNS&quot;.</li>
-                    <li className="[counter-increment:step]">Se ja existir um registro do tipo A apontando para a raiz do dominio, remova-o primeiro (nao e possivel ter dois registros diferentes no mesmo nome).</li>
-                    <li className="[counter-increment:step]">Crie um novo registro com os dados abaixo:</li>
-                  </ol>
-                  <table className="mt-4 w-full border-collapse text-xs font-medium">
-                    <thead>
-                      <tr className="text-left text-[var(--text-tertiary)]">
-                        <th className="pb-1 pr-4">Tipo</th>
-                        <th className="pb-1 pr-4">Nome</th>
-                        <th className="pb-1 pr-4">Valor</th>
-                        <th className="pb-1">TTL</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="font-mono text-[var(--text-primary)]">
-                        <td className="py-1 pr-4">CNAME</td>
-                        <td className="py-1 pr-4">{domainState.domain}</td>
-                        <td className="py-1 pr-4">{domainState.cnameTarget || "pik.bio"}</td>
-                        <td className="py-1 text-[var(--text-tertiary)]">Automatico (padrao)</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <ol className="mt-4 list-inside list-decimal space-y-3 text-sm text-[var(--text-secondary)]" start={5}>
-                    <li>Salve e aguarde a propagacao (de 5 minutos a algumas horas).</li>
-                    <li>Clique em &quot;Verificar status&quot; abaixo.</li>
-                  </ol>
-                  {(() => {
-                    const cleanDomain = (domainState.domain ?? "").replace(/^www\./, "");
-                    const parts = cleanDomain.split(".");
-                    const isRoot = parts.length <= 2 || (parts.length === 3 && parts[2].length <= 3);
-                    if (!isRoot) return null;
-                    return (
-                      <div className="mt-4 flex gap-2.5 rounded-[6px] border border-yellow-500/20 bg-yellow-500/5 p-3 text-xs leading-relaxed text-yellow-300">
-                        <AlertTriangle size={16} className="mt-0.5 shrink-0 text-yellow-400" />
-                        <span>
-                          Alguns provedores nao permitem CNAME na raiz do dominio. Se aparecer erro ao salvar, procure pela opcao <strong>ALIAS</strong> ou <strong>ANAME</strong> no lugar de CNAME &mdash; elas funcionam da mesma forma para dominios raiz (ex: seudominio.com). Se for um subdominio (ex: loja.seudominio.com), CNAME funciona normalmente em qualquer provedor.
-                        </span>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                <p className="text-xs text-[var(--text-tertiary)]">
-                  <Zap size={12} className="mr-1 inline text-yellow-400" />
-                  O certificado de seguranca (SSL) e emitido automaticamente apos a verificacao do DNS &mdash; pode levar alguns minutos extras.
-                </p>
-
-                <div>
-                  <Button
-                    variant="secondary"
-                    className="text-red-400 hover:text-red-300"
-                    onClick={() => setDomainRemoveConfirm(true)}
-                  >
-                    Remover dominio
-                  </Button>
-                  <Modal
-                    open={domainRemoveConfirm}
-                    onClose={() => setDomainRemoveConfirm(false)}
-                    title="Desconectar dominio"
-                    maxWidth="max-w-sm"
-                  >
-                    <div className="space-y-4 p-1 text-sm text-[var(--text-secondary)]">
-                      <div className="flex items-center gap-3 rounded-[6px] border border-red-500/20 bg-red-500/5 p-3">
-                        <AlertTriangle size={20} className="shrink-0 text-red-400" />
-                        <span>Tem certeza que deseja desconectar este dominio? A loja voltara a usar o endereco pik.bio/{creator?.username ?? "..."}.</span>
-                      </div>
-                      <div className="flex justify-end gap-2">
-                        <Button variant="secondary" onClick={() => setDomainRemoveConfirm(false)}>Cancelar</Button>
-                        <Button
-                          loading={saving === "domain-remove"}
-                          onClick={async () => {
-                            setSaving("domain-remove");
-                            await fetch("/api/custom-domain", { method: "DELETE", credentials: "include" });
-                            setSaving(null);
-                            setDomainRemoveConfirm(false);
-                            setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null, cnameTarget: null });
-                            setDomainInput("");
-                            showToast("Dominio removido");
-                          }}
-                        >
-                          Sim, desconectar
-                        </Button>
-                      </div>
-                    </div>
-                  </Modal>
-                </div>
-              </div>
-            ) : (
-              <div className="mt-5 space-y-4">
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
-                  Conecte um dominio proprio para sua loja. Apos conectar, configure o CNAME no seu provedor de DNS.
-                </p>
-                <div className="flex gap-3">
-                  <Input
-                    label="Seu dominio"
-                    value={domainInput}
-                    onChange={(event) => setDomainInput(event.target.value.toLowerCase())}
-                    placeholder="seudominio.com.br"
-                    className="min-w-0 flex-1"
-                  />
-                  <div className="flex items-end">
-                    <Button
-                      loading={saving === "domain-connect"}
-                      disabled={!domainInput.match(/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/)}
-                      onClick={async () => {
-                        setSaving("domain-connect");
-                        const response = await fetch("/api/custom-domain", {
-                          method: "POST",
-                          credentials: "include",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ domain: domainInput }),
-                        });
-                        const payload = await response.json().catch(() => ({}));
-                        setSaving(null);
-                        if (!response.ok) {
-                          showToast(payload.error ?? "Erro ao conectar dominio");
-                          return;
-                        }
-                        setDomainState(payload.data);
-                        showToast("Dominio conectado! Configure o DNS para ativar.");
-                      }}
-                    >
-                      Conectar dominio
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            )}
-          </Card>
-        ) : (
-          <Card className="p-5">
-            <SectionTitle icon={Globe} title="Dominio" text="Dominio proprio para sua loja." />
-            <div className="mt-5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
-              <p className="text-sm font-bold text-[var(--text-primary)]">Disponivel no Plano Pro</p>
-              <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                Faça upgrade para o Plano Pro para conectar seu proprio dominio e remover a marca d&apos;agua.
-              </p>
-              <Button className="mt-4" onClick={() => setActiveSection("plan")}>
-                Fazer upgrade
-              </Button>
-            </div>
-          </Card>
-        )
-      )}
-
       {activeSection === "plan" && (
         billing?.is_pro ? (
           <Card className="p-5">
@@ -979,10 +739,6 @@ export default function ConfiguracoesPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-0.5 text-red-400">&#10007;</span>
-                    <span className="text-[var(--text-tertiary)]">Dominio personalizado</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-0.5 text-red-400">&#10007;</span>
                     <span className="text-[var(--text-tertiary)]">Notificacoes WhatsApp</span>
                   </li>
                 </ul>
@@ -1008,10 +764,6 @@ export default function ConfiguracoesPage() {
                   <li className="flex items-start gap-2">
                     <span className="mt-0.5 text-[#22C55E]">&#10003;</span>
                     <span>Taxa de apenas <span className="font-bold text-[#22C55E]">5%</span> por venda</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="mt-0.5 text-[#22C55E]">&#10003;</span>
-                    <span>Dominio personalizado (seudominio.com.br)</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="mt-0.5 text-[#22C55E]">&#10003;</span>
@@ -1102,7 +854,6 @@ const settingsSections: Array<{ key: SectionKey; label: string; icon: typeof Use
   { key: "payments", label: "Pagamentos", icon: KeyRound },
   { key: "notifications", label: "Notificacoes", icon: Bell },
   { key: "integrations", label: "Integracoes", icon: Link2 },
-  ...(FEATURE_CUSTOM_DOMAIN ? [{ key: "domain" as const, label: "Dominio", icon: Globe }] : []),
   { key: "plan", label: "Plano", icon: CreditCard },
 ];
 
