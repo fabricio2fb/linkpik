@@ -57,7 +57,7 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
 
     const { data: product } = await supabase
       .from("products")
-      .select("id, title, file_url, cover_url, type, details")
+      .select("id, title, cover_url, type, details")
       .eq("id", order.product_id)
       .single();
 
@@ -65,16 +65,9 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
 
     const details = asRecord(product.details);
     const externalLink = getExternalDeliveryLink(details);
-    let downloadUrl: string | null = null;
-
-    if (product.file_url) {
-      const { data: signed, error } = await supabase.storage.from("product-files").createSignedUrl(product.file_url, 1800);
-      if (error) throw new ApiError(500, "Erro ao gerar acesso");
-      downloadUrl = signed.signedUrl;
-    }
 
     const rawDeliveryMessage = stringField(details, "deliveryMessage");
-    const deliveryLink = downloadUrl ?? externalLink;
+    const deliveryLink = externalLink;
     const deliveryMessage = rawDeliveryMessage
       ? applyMessageTokens(rawDeliveryMessage, {
           buyerName: order.buyer_name,
@@ -86,7 +79,7 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
     const thankYouUrl = rawThankYou ? sanitizeUrl(rawThankYou) : "";
     const thankYouMessage = rawThankYou && !thankYouUrl ? rawThankYou : null;
 
-    if (!downloadUrl && !externalLink && !deliveryMessage && !thankYouUrl && !thankYouMessage) {
+    if (!externalLink && !deliveryMessage && !thankYouUrl && !thankYouMessage) {
       console.warn("[AccessDeliveryMissing]", { order_id: order.id, product_id: product.id });
       throw new ApiError(404, "Arquivo nao encontrado");
     }
@@ -105,7 +98,6 @@ export async function GET(_request: Request, context: { params: Promise<{ token:
         type: product.type,
         cover_url: product.cover_url,
       },
-      download_url: downloadUrl,
       delivery_url: externalLink,
       delivery_message: deliveryMessage,
       thank_you_message: thankYouMessage,

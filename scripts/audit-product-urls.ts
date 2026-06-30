@@ -3,14 +3,13 @@ import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { sanitizeUrl } from "../lib/api/sanitize-url";
 
-const URL_FIELDS = ["file_url", "cover_url"] as const;
+const URL_FIELDS = ["cover_url"] as const;
 const DETAILS_URL_FIELDS = ["deliveryUrl", "accessLink", "courseUrl"] as const;
 const PAGE_SIZE = 1000;
 
 type ProductRow = {
   id: string;
   creator_id: string;
-  file_url: string | null;
   cover_url: string | null;
   details: Record<string, unknown> | null;
 };
@@ -66,7 +65,7 @@ async function main() {
     const to = from + PAGE_SIZE - 1;
     const query = supabase
       .from("products")
-      .select(detailsColumnAvailable ? "id, creator_id, file_url, cover_url, details" : "id, creator_id, file_url, cover_url")
+      .select(detailsColumnAvailable ? "id, creator_id, cover_url, details" : "id, creator_id, cover_url")
       .range(from, to);
 
     let result = await query;
@@ -78,7 +77,7 @@ async function main() {
       warnings.push("A coluna products.details nao existe neste banco; campos details.deliveryUrl/details.accessLink/details.courseUrl nao foram auditados.");
       const fallback = await supabase
         .from("products")
-        .select("id, creator_id, file_url, cover_url")
+        .select("id, creator_id, cover_url")
         .range(from, to);
       data = fallback.data as unknown;
       error = fallback.error;

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Eye, EyeOff } from "lucide-react";
 import { FormEvent, useState } from "react";
@@ -12,12 +12,14 @@ import { Input } from "@/components/ui/Input";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const success = searchParams.get("senha_alterada") === "true";
 
   const emailError = submitted && !/^\S+@\S+\.\S+$/.test(email) ? "Email inválido" : "";
   const passwordError = submitted && password.length < 6 ? "Senha curta" : "";
@@ -64,6 +66,11 @@ export default function LoginPage() {
           <p className="mt-3 text-[var(--text-secondary)]">Junte-se a criadores que transformaram a bio em loja</p>
         </div>
         <Card className="p-5">
+          {success && (
+            <p className="mb-4 rounded-[10px] border border-[#22C55E]/30 bg-[#22C55E]/10 p-3 text-center text-sm font-semibold text-[#22C55E]">
+              Senha alterada com sucesso. Faça login com sua nova senha.
+            </p>
+          )}
           <form onSubmit={submit} className="grid gap-4">
             <Input
               label="Email"
@@ -86,6 +93,11 @@ export default function LoginPage() {
                 </button>
               }
             />
+            <div className="-mt-2 flex justify-end">
+              <Link href="/recuperar-senha" className="text-xs font-semibold text-[var(--text-secondary)] hover:text-[#FF4D6D] transition">
+                Esqueceu a senha?
+              </Link>
+            </div>
             <Button loading={loading} className="w-full" type="submit">
               Entrar
             </Button>

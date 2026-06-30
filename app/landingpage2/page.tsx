@@ -33,7 +33,7 @@ const flow = [
   { icon: Store, title: "Crie a loja", text: "Perfil, banner, vídeo, links e visual." },
   { icon: FileText, title: "Cadastre o produto", text: "Imagem, preço, descrição e entrega." },
   { icon: CreditCard, title: "Receba o pagamento", text: "Checkout integrado para o comprador." },
-  { icon: LockKeyhole, title: "Libere o acesso", text: "Link ou arquivo entregue após aprovação." },
+  { icon: LockKeyhole, title: "Libere o acesso", text: "Link entregue após aprovação." },
 ];
 
 const products = [

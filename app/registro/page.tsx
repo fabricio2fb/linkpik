@@ -18,6 +18,7 @@ export default function RegistroPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -26,7 +27,8 @@ export default function RegistroPage() {
     name.trim().length > 2 &&
     /^\S+@\S+\.\S+$/.test(email) &&
     password.length >= 6 &&
-    password === confirm;
+    password === confirm &&
+    acceptedTerms;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -68,6 +70,14 @@ export default function RegistroPage() {
     router.push("/dashboard");
   }
 
+  async function handleGoogleLogin() {
+    const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/dashboard` },
+    });
+  }
+
   return (
     <main className="noise-bg grid min-h-screen place-items-center px-5 py-10">
       <div className="w-full max-w-[400px]">
@@ -107,11 +117,34 @@ export default function RegistroPage() {
               onChange={(event) => setConfirm(event.target.value)}
               error={submitted && confirm !== password ? "As senhas não conferem" : ""}
             />
+            <label className="flex items-start gap-2 text-xs text-[var(--text-secondary)]">
+              <input
+                type="checkbox"
+                checked={acceptedTerms}
+                onChange={(event) => setAcceptedTerms(event.target.checked)}
+                className="mt-0.5 size-4 shrink-0 accent-[#FF4D6D]"
+              />
+              <span>
+                Aceito os <Link href="/termos" className="underline hover:text-[#FF4D6D]">Termos de Uso</Link> e a{" "}
+                <Link href="/privacidade" className="underline hover:text-[#FF4D6D]">Política de Privacidade</Link>
+              </span>
+            </label>
+            {submitted && !acceptedTerms && (
+              <p className="-mt-2 text-xs font-semibold text-red-400">Você precisa aceitar os termos para continuar.</p>
+            )}
             <Button loading={loading} className="w-full" type="submit">
               Criar minha loja grátis
             </Button>
             {error && <p className="text-sm font-semibold text-red-400">{error}</p>}
           </form>
+          <div className="my-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--text-tertiary)]">
+            <span className="h-px flex-1 bg-[var(--border-subtle)]" />
+            ou
+            <span className="h-px flex-1 bg-[var(--border-subtle)]" />
+          </div>
+          <Button variant="secondary" className="w-full" onClick={handleGoogleLogin}>
+            Criar conta com Google
+          </Button>
           <Link href="/login" className="mt-5 block text-center text-sm font-semibold text-[#FF4D6D]">
             Já tenho conta
           </Link>

@@ -97,7 +97,6 @@ const ProductPayloadSchema = z.object({
   description: z.string().max(5000).optional(),
   price: z.number().positive().max(99999),
   type: z.enum(PRODUCT_TYPES),
-  file_url: z.string().url().optional().nullable(),
   cover_url: z.string().url().optional().nullable(),
   image_provider: z.enum(["cloudinary", "supabase", "external"]).optional().nullable(),
   image_public_id: z.string().trim().max(300).regex(/^[A-Za-z0-9/_-]+$/).optional().nullable(),
@@ -125,7 +124,13 @@ const ProductPayloadSchema = z.object({
 
 export const CreateProductSchema = ProductPayloadSchema.superRefine((data, ctx) => {
   const isPhysical = data.type === "fisico" || data.product_kind === "physical";
-  if (!isPhysical) return;
+
+  if (!isPhysical) {
+    if (!data.details?.deliveryUrl) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["details", "deliveryUrl"], message: "Link de acesso obrigatorio para produto digital" });
+    }
+    return;
+  }
 
   const requiredPositiveFields = [
     ["weight_grams", data.weight_grams],

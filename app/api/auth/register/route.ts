@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { ensureCreatorAccount } from "@/lib/api/creator-provisioning";
 import { ApiError } from "@/lib/api/errors";
+import { sendWelcomeEmail } from "@/lib/api/mailer";
 import { err, ok } from "@/lib/api/response";
 import { sanitizeText } from "@/lib/api/sanitize";
 import { createSupabaseService } from "@/lib/api/supabase-service";
@@ -81,6 +82,12 @@ export async function POST(request: Request) {
     });
 
     if (!creator) throw registrationError("Erro ao criar creator");
+
+    sendWelcomeEmail({
+      to: email,
+      name,
+      username: creator.username ?? username ?? "",
+    }).catch((err) => console.error("[WelcomeEmail]", err));
 
     return ok({ creator });
   } catch (e) {

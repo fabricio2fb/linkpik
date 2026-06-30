@@ -1,11 +1,10 @@
 import { ApiError } from "@/lib/api/errors";
 import { sanitizeUrl } from "@/lib/api/sanitize-url";
 
-const PRODUCT_URL_FIELDS = ["file_url", "cover_url", "image_url"] as const;
+const PRODUCT_URL_FIELDS = ["cover_url", "image_url"] as const;
 const PRODUCT_DETAILS_URL_FIELDS = ["deliveryUrl", "accessLink", "courseUrl"] as const;
 
 type ProductUrlPayload = {
-  file_url?: string | null;
   cover_url?: string | null;
   image_url?: string | null;
   details?: Record<string, unknown>;

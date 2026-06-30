@@ -172,6 +172,7 @@ export default function ProductForm({ initialProduct, products = [], productKind
       if (!draft.shortDescription?.trim()) nextErrors.shortDescription = "Informe a descrição curta.";
       if (!draft.description.trim()) nextErrors.description = "Informe a descrição completa.";
       if (draft.includes.filter(Boolean).length < 2) nextErrors.includes = "Adicione pelo menos 2 itens.";
+      if (draft.type === "infoproduto" && !draft.deliveryUrl?.trim()) nextErrors.deliveryUrl = "Informe o link de acesso.";
       if (draft.type === "template" && !draft.accessLink?.trim()) nextErrors.accessLink = "Informe o link de acesso.";
       if (draft.type === "mentoria" && !draft.sessionDuration) nextErrors.sessionDuration = "Informe a duração.";
       if (draft.type === "comunidade" && !draft.communityPlatform) nextErrors.communityPlatform = "Informe a plataforma.";
@@ -446,7 +447,7 @@ export default function ProductForm({ initialProduct, products = [], productKind
                 <div>
                   <p className="font-bold text-[var(--text-primary)]">{draft.name || "Produto sem nome"}</p>
                   <p className="text-sm text-[var(--text-secondary)]">{meta.label} • {formatPrice(draft.price || 0)}</p>
-                  <p className="text-xs text-[var(--text-tertiary)]">{draft.includes.filter(Boolean).length} itens incluídos • {draft.deliveryPlatform ?? draft.templatePlatform ?? draft.communityPlatform ?? "Entrega automática"}</p>
+                  <p className="text-xs text-[var(--text-tertiary)]">{draft.includes.filter(Boolean).length} itens incluídos • {draft.type === "infoproduto" ? "Link de acesso" : draft.deliveryPlatform ?? draft.templatePlatform ?? draft.communityPlatform ?? "Entrega automática"}</p>
                 </div>
               </div>
             </div>
@@ -502,11 +503,9 @@ function SpecificFields({ draft, update, errors }: { draft: Product; update: <K 
             Após o pagamento aprovado, o cliente recebe acesso automaticamente.
           </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <Select label="Tipo de entrega" value={draft.deliveryPlatform ?? "Entrega automatica"} onChange={(v) => update("deliveryPlatform", v)} options={["Entrega automatica", "Link externo", "Area de membros", "Email manual"]} />
-          <Input label="Link de acesso" value={draft.deliveryUrl ?? ""} onChange={(e) => update("deliveryUrl", e.target.value)} />
-          <Input label="Arquivo" value={draft.totalSize ?? ""} onChange={(e) => update("totalSize", e.target.value)} placeholder="PDF, ZIP, video, planilha..." />
-          <Textarea className="md:col-span-2" label="Instruções para o comprador" value={draft.usageInstructions ?? ""} onChange={(e) => update("usageInstructions", e.target.value)} />
+        <div className="grid gap-4">
+          <Input label="Link de acesso" value={draft.deliveryUrl ?? ""} onChange={(e) => update("deliveryUrl", e.target.value)} error={errors.deliveryUrl} />
+          <Textarea label="Instruções para o comprador" value={draft.usageInstructions ?? ""} onChange={(e) => update("usageInstructions", e.target.value)} />
         </div>
       </div>
     );
@@ -539,7 +538,7 @@ function SpecificFields({ draft, update, errors }: { draft: Product; update: <K 
     );
   }
   if (draft.type === "ebook") {
-    return <div className="grid gap-4 md:grid-cols-2"><Select label="Plataforma de entrega" value={draft.deliveryPlatform ?? "Vou subir o arquivo aqui"} onChange={(v) => update("deliveryPlatform", v)} options={["Vou subir o arquivo aqui", "Link externo", "Notion / outro"]} /><Input label="Link externo" value={draft.deliveryUrl ?? ""} onChange={(e) => update("deliveryUrl", e.target.value)} /><Input label="Número de páginas" type="number" value={draft.pages ?? ""} onChange={(e) => update("pages", Number(e.target.value) || undefined)} /><Select label="Idioma" value={draft.language ?? "Português"} onChange={(v) => update("language", v as Product["language"])} options={["Português", "Inglês", "Espanhol"]} /><Select label="Nível" value={draft.level ?? "Iniciante"} onChange={(v) => update("level", v as Product["level"])} options={["Iniciante", "Intermediário", "Avançado"]} /></div>;
+    return <div className="grid gap-4 md:grid-cols-2"><Select label="Plataforma de entrega" value={draft.deliveryPlatform ?? "Link externo"} onChange={(v) => update("deliveryPlatform", v)} options={["Link externo", "Notion / outro"]} /><Input label="Link externo" value={draft.deliveryUrl ?? ""} onChange={(e) => update("deliveryUrl", e.target.value)} /><Input label="Número de páginas" type="number" value={draft.pages ?? ""} onChange={(e) => update("pages", Number(e.target.value) || undefined)} /><Select label="Idioma" value={draft.language ?? "Português"} onChange={(v) => update("language", v as Product["language"])} options={["Português", "Inglês", "Espanhol"]} /><Select label="Nível" value={draft.level ?? "Iniciante"} onChange={(v) => update("level", v as Product["level"])} options={["Iniciante", "Intermediário", "Avançado"]} /></div>;
   }
   if (draft.type === "planilha") {
     return <div className="grid gap-4"><Select label="Plataforma" value={draft.deliveryPlatform ?? "Excel (.xlsx)"} onChange={(v) => update("deliveryPlatform", v)} options={["Excel (.xlsx)", "Google Sheets (link)", "Numbers"]} /><Input label="Link Google Sheets" value={draft.deliveryUrl ?? ""} onChange={(e) => update("deliveryUrl", e.target.value)} /><Checkboxes label="Compatível com" values={["PC", "Mac", "Celular"]} selected={draft.compatibleWith ?? []} onChange={(v) => update("compatibleWith", v)} /></div>;
@@ -554,7 +553,7 @@ function SpecificFields({ draft, update, errors }: { draft: Product; update: <K 
     return <div className="grid gap-4 md:grid-cols-2"><Select label="Duração da sessão*" value={draft.sessionDuration ?? "1h"} onChange={(v) => update("sessionDuration", v)} error={errors.sessionDuration} options={["30min", "45min", "1h", "1h30", "2h"]} /><Select label="Formato*" value={draft.sessionFormat ?? "Google Meet"} onChange={(v) => update("sessionFormat", v)} options={["Google Meet", "Zoom", "Teams", "WhatsApp Video"]} /><Select label="Como agendar*" value={draft.schedulingMethod ?? "Combinado após pagamento"} onChange={(v) => update("schedulingMethod", v)} options={["Calendly (link)", "WhatsApp", "Email", "Combinado após pagamento"]} /><Input label="Link/número/email" value={draft.schedulingValue ?? ""} onChange={(e) => update("schedulingValue", e.target.value)} /><Textarea label="Disponibilidade" value={draft.availability ?? ""} onChange={(e) => update("availability", e.target.value)} /><Toggle label="Inclui gravação" checked={draft.recordingIncluded ?? false} onChange={(v) => update("recordingIncluded", v)} /><Input label="Vagas disponíveis" type="number" value={draft.seats ?? ""} onChange={(e) => update("seats", Number(e.target.value) || undefined)} /></div>;
   }
   if (draft.type === "pack") {
-    return <div className="grid gap-4"><Input label="Número de arquivos" type="number" value={draft.fileCount ?? ""} onChange={(e) => update("fileCount", Number(e.target.value) || undefined)} /><Checkboxes label="Tipos de arquivo inclusos" values={["PDF", "JPG/PNG", "MP4", "MP3", "PSD", "AI", "ZIP", "Excel", "Outro"]} selected={draft.fileTypes ?? []} onChange={(v) => update("fileTypes", v)} /><Select label="Tamanho total aproximado" value={draft.totalSize ?? "< 10MB"} onChange={(v) => update("totalSize", v)} options={["< 10MB", "10-50MB", "50-200MB", "+200MB"]} /><Select label="Plataforma de entrega" value={draft.deliveryPlatform ?? "Link externo"} onChange={(v) => update("deliveryPlatform", v)} options={["Vou subir o arquivo aqui", "Link externo", "Notion / outro"]} /><Select label="Licença" value={draft.license ?? "Uso pessoal"} onChange={(v) => update("license", v)} options={["Uso pessoal", "Uso comercial", "Revenda"]} /></div>;
+    return <div className="grid gap-4"><Input label="Número de arquivos" type="number" value={draft.fileCount ?? ""} onChange={(e) => update("fileCount", Number(e.target.value) || undefined)} /><Checkboxes label="Tipos de arquivo inclusos" values={["PDF", "JPG/PNG", "MP4", "MP3", "PSD", "AI", "ZIP", "Excel", "Outro"]} selected={draft.fileTypes ?? []} onChange={(v) => update("fileTypes", v)} /><Select label="Tamanho total aproximado" value={draft.totalSize ?? "< 10MB"} onChange={(v) => update("totalSize", v)} options={["< 10MB", "10-50MB", "50-200MB", "+200MB"]} /><Select label="Plataforma de entrega" value={draft.deliveryPlatform ?? "Link externo"} onChange={(v) => update("deliveryPlatform", v)} options={["Link externo", "Notion / outro"]} /><Select label="Licença" value={draft.license ?? "Uso pessoal"} onChange={(v) => update("license", v)} options={["Uso pessoal", "Uso comercial", "Revenda"]} /></div>;
   }
   return <div className="grid gap-4"><Select label="Plataforma*" value={draft.communityPlatform ?? "WhatsApp"} onChange={(v) => update("communityPlatform", v)} error={errors.communityPlatform} options={["WhatsApp", "Telegram", "Discord", "Circle", "Outro"]} /><Select label="Como funciona o acesso*" value={draft.accessMethod ?? "Link de convite enviado por email"} onChange={(v) => update("accessMethod", v)} options={["Link de convite enviado por email", "Aprovação manual pelo criador", "Código de acesso"]} /><Select label="Frequência de conteúdo" value={draft.contentFrequency ?? "Semanal"} onChange={(v) => update("contentFrequency", v)} options={["Diário", "Semanal", "Quinzenal", "Mensal", "Sem frequência fixa"]} /><Input label="Número atual de membros" type="number" value={draft.members ?? ""} onChange={(e) => update("members", Number(e.target.value) || undefined)} /><Select label="Renovação" value={draft.renewal ?? "Mensal"} onChange={(v) => update("renewal", v)} options={["Mensal", "Trimestral", "Anual", "Vitalício"]} /></div>;
 }
