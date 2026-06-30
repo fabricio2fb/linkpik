@@ -5,6 +5,7 @@ import { Copy, ExternalLink, Eye, EyeOff, GripVertical, ImagePlus, Package, Penc
 import { ChangeEvent, useState } from "react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import DeleteProductDialog from "@/components/dashboard/DeleteProductDialog";
 import { Input, Textarea } from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import ProductForm from "@/components/editor/ProductForm";
@@ -57,6 +58,8 @@ export default function StoreEditor({
   const [coverUploadError, setCoverUploadError] = useState("");
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState("");
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   function updateCreator<K extends keyof Creator>(key: K, value: Creator[K]) {
     onCreatorChange({ ...creator, [key]: value });
@@ -332,12 +335,15 @@ export default function StoreEditor({
   }
 
   async function deleteProduct(productId: string) {
+    setDeleting(true);
     const response = await fetch(`/api/products/${productId}`, { method: "DELETE", credentials: "include" });
+    setDeleting(false);
     if (!response.ok) {
       onToast("Erro ao remover produto");
       return;
     }
     onProductsChange(products.filter((product) => product.id !== productId));
+    setDeletingProduct(null);
     onToast("Produto removido");
   }
 
@@ -437,14 +443,14 @@ export default function StoreEditor({
                 </button>
               )}
             </div>
-            <label className="relative grid aspect-video cursor-pointer place-items-center overflow-hidden rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--bg-input)] text-center">
+            <label className="relative grid cursor-pointer place-items-center overflow-hidden rounded-2xl border border-dashed border-[var(--border-subtle)] bg-[var(--bg-input)] text-center" style={{ aspectRatio: "16/7" }}>
               {creator.coverImage ? (
                 <Image src={creator.coverImage} alt="" fill sizes="(max-width: 768px) 100vw, 600px" className="object-contain" unoptimized={!canUseOptimizedImage(creator.coverImage)} />
               ) : (
                 <div className="p-4 text-[var(--text-secondary)]">
                   <ImagePlus className="mx-auto" size={26} />
                   <p className="mt-2 text-sm font-semibold">Adicionar foto de capa (opcional)</p>
-                  <p className="mt-1 text-xs">1200x675px recomendado</p>
+                  <p className="mt-1 text-xs">1600x700px recomendado</p>
                 </div>
               )}
               {coverUploading && <p className="pb-3 text-sm font-bold text-[#FF4D6D]">Enviando imagem...</p>}
@@ -792,7 +798,7 @@ export default function StoreEditor({
                     <LinkButton href={`/${creator.username}/${product.id}`} />
                     <button
                       type="button"
-                      onClick={() => deleteProduct(product.id)}
+                      onClick={() => setDeletingProduct(product)}
                       className="grid size-9 place-items-center rounded-[10px] bg-[var(--bg-surface)] text-[var(--text-primary)] transition hover:opacity-80"
                       aria-label="Remover produto"
                     >
@@ -826,6 +832,13 @@ export default function StoreEditor({
           />
         </div>
       </Modal>
+      <DeleteProductDialog
+        open={!!deletingProduct}
+        productName={deletingProduct?.name ?? ""}
+        loading={deleting}
+        onConfirm={() => deletingProduct && deleteProduct(deletingProduct.id)}
+        onCancel={() => setDeletingProduct(null)}
+      />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { FEATURE_PHYSICAL_PRODUCT } from "@/lib/feature-flags";
+import { FEATURE_CUSTOM_DOMAIN, FEATURE_PHYSICAL_PRODUCT } from "@/lib/feature-flags";
 
 const PUBLIC_ROUTES = ["/", "/login", "/registro", "/lojaexemplo", "/recuperar-senha"];
 const PUBLIC_API_PREFIXES = ["/api/public", "/api/webhooks", "/api/analytics/track", "/api/access"];
@@ -46,6 +47,34 @@ function withSecurityHeaders(response: NextResponse) {
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = withSecurityHeaders(NextResponse.next());
+
+  const host = request.headers.get("host") ?? "";
+  const mainHost = new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").host;
+  const isCustomDomain = FEATURE_CUSTOM_DOMAIN && host && host !== mainHost && !host.includes("localhost");
+
+  if (isCustomDomain) {
+    const serviceRole = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } },
+    );
+    const { data: settings } = await serviceRole
+      .from("creator_settings")
+      .select("creator_id, custom_domain, domain_verified")
+      .eq("custom_domain", host)
+      .maybeSingle();
+
+    if (settings?.domain_verified && settings.creator_id) {
+      const { data: creator } = await serviceRole
+        .from("creators")
+        .select("username")
+        .eq("id", settings.creator_id)
+        .single();
+      if (creator?.username) {
+        return withSecurityHeaders(NextResponse.rewrite(new URL(`/${creator.username}${pathname}`, request.url)));
+      }
+    }
+  }
 
   const isPhysicalProductPage =
     PHYSICAL_PRODUCT_PAGE_EXACT.includes(pathname) ||

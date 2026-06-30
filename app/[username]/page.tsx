@@ -6,8 +6,7 @@ import { getPublicStore } from "@/lib/public-store";
 import type { Product } from "@/lib/types";
 import { notFound } from "next/navigation";
 
-export const revalidate = 60;
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type PublicStorePageProps = {
   params: Promise<{ username: string }>;
@@ -35,6 +34,7 @@ export default async function PublicStorePage({ params }: PublicStorePageProps) 
         creator={creator}
         products={products}
         theme={creator.theme}
+        hideBranding={creator.plan === "pro"}
       />
     </>
   );

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import DeleteProductDialog from "@/components/dashboard/DeleteProductDialog";
 import Modal from "@/components/ui/Modal";
 import Toast from "@/components/ui/Toast";
 import ProductForm from "@/components/editor/ProductForm";
@@ -23,6 +24,8 @@ export default function DashboardProdutosPage() {
   const [draggedProductId, setDraggedProductId] = useState<string | null>(null);
   const [dragOverProductId, setDragOverProductId] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch("/api/products", { credentials: "include" })
@@ -67,12 +70,15 @@ export default function DashboardProdutosPage() {
   }
 
   async function deleteProduct(id: string) {
+    setDeleting(true);
     const response = await fetch(`/api/products/${id}`, { method: "DELETE", credentials: "include" });
+    setDeleting(false);
     if (!response.ok) {
       showToast("Erro ao remover produto");
       return;
     }
     setProducts((current) => current.filter((item) => item.id !== id));
+    setDeletingProduct(null);
     showToast("Produto removido");
   }
 
@@ -163,7 +169,7 @@ export default function DashboardProdutosPage() {
                   <div className="flex gap-2">
                     <Button variant="secondary" className="flex-1" onClick={() => { setEditingProduct(product); setModalOpen(true); }}><Pencil size={16} />Editar</Button>
                     <a href={`/dashboard`} target="_blank" rel="noreferrer"><Button variant="secondary"><ExternalLink size={16} /></Button></a>
-                    <Button variant="secondary" onClick={() => deleteProduct(product.id)}><Trash2 size={16} /></Button>
+                    <Button variant="secondary" onClick={() => setDeletingProduct(product)}><Trash2 size={16} /></Button>
                   </div>
                 </div>
               </Card>
@@ -175,6 +181,13 @@ export default function DashboardProdutosPage() {
       <Modal open={modalOpen} title={editingProduct ? "Editar produto" : "Novo produto"} onClose={() => setModalOpen(false)} maxWidth="max-w-[680px]">
         <ProductForm initialProduct={editingProduct ?? undefined} products={products} onCancel={() => setModalOpen(false)} onSave={saveProduct} />
       </Modal>
+      <DeleteProductDialog
+        open={!!deletingProduct}
+        productName={deletingProduct?.name ?? ""}
+        loading={deleting}
+        onConfirm={() => deletingProduct && deleteProduct(deletingProduct.id)}
+        onCancel={() => setDeletingProduct(null)}
+      />
       <Toast message={toast} />
     </div>
   );

@@ -171,32 +171,7 @@ export default function Sidebar({ mobileOpen = false, onClose, creator }: Sideba
       </nav>
 
       <div className="mt-4 space-y-4">
-        {isPro ? (
-          <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 md:grid md:place-items-center xl:block xl:place-items-stretch">
-            <div className="flex items-center gap-3 md:justify-center xl:justify-start">
-              <div className={`relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full text-sm font-black text-white ring-2 ring-[#22C55E]/35 ${creator?.avatar_url ? "" : "bg-[#FF4D6D]"}`}>
-                {creator?.avatar_url ? <Image src={creator.avatar_url} alt="" fill sizes="40px" className="object-contain" unoptimized={!creator.avatar_url.startsWith("http")} /> : getInitials(creatorName)}
-              </div>
-              <div className="min-w-0 md:hidden xl:block">
-                <div className="flex items-center gap-2">
-                  <p className="truncate text-sm font-bold text-[var(--text-primary)]">{creatorName}</p>
-                  <span className="rounded-full bg-[#22C55E]/15 px-2 py-0.5 text-[10px] font-black text-[#22C55E]">PRO</span>
-                </div>
-                <p className="truncate text-xs text-[var(--text-secondary)]">@{creator?.username ?? "loja"}</p>
-              </div>
-            </div>
-            <Link
-              href={storeHref}
-              target={creator?.username ? "_blank" : undefined}
-              onClick={onClose}
-              className="mt-3 flex h-10 items-center justify-center gap-2 rounded-[10px] bg-[#22C55E] px-3 text-sm font-bold text-[#06130A] transition hover:brightness-110 md:mt-0 md:size-10 md:px-0 xl:mt-3 xl:size-auto xl:px-3"
-              aria-label="Ir para loja"
-            >
-              <ExternalLink size={16} />
-              <span className="md:hidden xl:inline">Ir para loja</span>
-            </Link>
-          </div>
-        ) : (
+        {!isPro && (
           <Link
             href="/dashboard/configuracoes"
             onClick={onClose}
@@ -206,6 +181,30 @@ export default function Sidebar({ mobileOpen = false, onClose, creator }: Sideba
             <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">Remova a marca d&apos;agua</p>
           </Link>
         )}
+        <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 md:grid md:place-items-center xl:block xl:place-items-stretch">
+          <div className="flex items-center gap-3 md:justify-center xl:justify-start">
+            <div className={`relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full text-sm font-black text-white ring-2 ${isPro ? "ring-[#22C55E]/35" : "ring-[#FF4D6D]/30"} ${creator?.avatar_url ? "" : "bg-[#FF4D6D]"}`}>
+              {creator?.avatar_url ? <Image src={creator.avatar_url} alt="" fill sizes="40px" className="object-contain" unoptimized={!creator.avatar_url.startsWith("http")} /> : getInitials(creatorName)}
+            </div>
+            <div className="min-w-0 md:hidden xl:block">
+              <div className="flex items-center gap-2">
+                <p className="truncate text-sm font-bold text-[var(--text-primary)]">{creatorName}</p>
+                {isPro && <span className="rounded-full bg-[#22C55E]/15 px-2 py-0.5 text-[10px] font-black text-[#22C55E]">PRO</span>}
+              </div>
+              <p className="truncate text-xs text-[var(--text-secondary)]">@{creator?.username ?? "loja"}</p>
+            </div>
+          </div>
+          <Link
+            href={storeHref}
+            target={creator?.username ? "_blank" : undefined}
+            onClick={onClose}
+            className="mt-3 flex h-10 items-center justify-center gap-2 rounded-[10px] bg-[#22C55E] px-3 text-sm font-bold text-[#06130A] transition hover:brightness-110 md:mt-0 md:size-10 md:px-0 xl:mt-3 xl:size-auto xl:px-3"
+            aria-label="Ir para loja"
+          >
+            <ExternalLink size={16} />
+            <span className="md:hidden xl:inline">Ir para loja</span>
+          </Link>
+        </div>
         <Link
           href="/login"
           className="flex h-11 items-center gap-3 rounded-[10px] px-3 text-sm font-semibold text-[var(--text-secondary)] transition hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]"

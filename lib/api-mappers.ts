@@ -87,6 +87,7 @@ export function mapApiCreator(row: ApiCreator, links?: unknown[]): Creator {
   const themeRecord = asRecord(row.store_theme);
   const theme = (row.store_theme as Creator["theme"]) ?? THEME_PRESETS.cards;
   return {
+    plan: typeof row.plan === "string" && (row.plan === "free" || row.plan === "pro") ? row.plan : "free",
     name: String(row.name || row.username || "Creator"),
     username: String(row.username || ""),
     bio: String(row.bio || ""),

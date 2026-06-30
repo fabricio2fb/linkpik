@@ -110,6 +110,13 @@ export default function ConfiguracoesPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
+  const [domainInput, setDomainInput] = useState("");
+  const [domainState, setDomainState] = useState<{
+    domain: string | null;
+    hostnameId: string | null;
+    status: string | null;
+    sslStatus: string | null;
+  }>({ domain: null, hostnameId: null, status: null, sslStatus: null });
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -183,6 +190,19 @@ export default function ConfiguracoesPage() {
     return () => {
       cancelled = true;
     };
+  }, [activeSection]);
+
+  useEffect(() => {
+    if (activeSection !== "domain") return;
+    fetch("/api/custom-domain", { credentials: "include" })
+      .then((response) => response.json())
+      .then((payload) => {
+        if (payload.data) {
+          setDomainState(payload.data);
+          setDomainInput(payload.data.domain ?? "");
+        }
+      })
+      .catch(() => undefined);
   }, [activeSection]);
 
   function showToast(message: string) {
@@ -685,18 +705,138 @@ export default function ConfiguracoesPage() {
         }, "Integracoes salvas", "integrations")}><Save size={16} />Salvar integracoes</Button>
       </Card>}
 
-      {FEATURE_CUSTOM_DOMAIN && activeSection === "domain" && <Card className="p-5">
-        <SectionTitle icon={Globe} title="Dominio" text="Dominio proprio para sua loja." />
-        <div className="mt-5 grid gap-4 md:grid-cols-[1fr_auto_auto]">
-          <Input label="Dominio customizado" value={settings.custom_domain ?? ""} onChange={(event) => setSettings((current) => ({ ...current, custom_domain: event.target.value.toLowerCase() }))} placeholder="seudominio.com.br" />
-          <div className="flex items-end"><Button loading={saving === "domain"} onClick={() => patchSettings({ custom_domain: normalizeNullable(settings.custom_domain) }, "Dominio salvo", "domain")}>Salvar</Button></div>
-          <div className="flex items-end"><Button variant="secondary" loading={saving === "domain-verify"} onClick={verifyDomain}>Verificar DNS</Button></div>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
-          <Badge tone={settings.domain_verified ? "success" : "neutral"}>{settings.domain_verified ? "Verificado" : "Pendente"}</Badge>
-          <p className="text-xs text-[var(--text-secondary)]">Configure um CNAME apontando para pik.bio.</p>
-        </div>
-      </Card>}
+      {FEATURE_CUSTOM_DOMAIN && activeSection === "domain" && (
+        billing?.is_pro ? (
+          <Card className="p-5">
+            <SectionTitle icon={Globe} title="Dominio" text="Dominio proprio para sua loja." />
+
+            {domainState.hostnameId ? (
+              <div className="mt-5 space-y-5">
+                <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-[var(--text-primary)]">{domainState.domain}</p>
+                      <div className="mt-2 flex items-center gap-2">
+                        {domainState.status === "active" ? (
+                          <Badge tone="success">Ativo</Badge>
+                        ) : domainState.status === "verifying" ? (
+                          <Badge tone="warning">Verificando</Badge>
+                        ) : (
+                          <Badge tone="neutral">Pendente</Badge>
+                        )}
+                        <span className="text-xs text-[var(--text-secondary)]">
+                          SSL: {domainState.sslStatus ?? "pendente"}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      loading={saving === "domain-verify"}
+                      onClick={async () => {
+                        setSaving("domain-verify");
+                        const response = await fetch("/api/creators/me/domain/verify", { method: "POST", credentials: "include" });
+                        const payload = await response.json().catch(() => ({}));
+                        setSaving(null);
+                        if (payload.data?.verified) {
+                          setDomainState((current) => ({ ...current, status: "active" }));
+                          showToast("Dominio verificado!");
+                        } else {
+                          showToast(payload.data?.message ?? payload.error ?? "Aguardando configuracao de DNS");
+                        }
+                      }}
+                    >
+                      Verificar status
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
+                  <p className="text-sm font-bold text-[var(--text-primary)]">Instrucoes de DNS</p>
+                  <p className="mt-1 text-xs text-[var(--text-secondary)]">
+                    Configure o CNAME abaixo no seu provedor de dominio.
+                  </p>
+                  <div className="mt-3 grid grid-cols-[auto_1fr_auto] gap-2 text-xs font-medium">
+                    <span className="text-[var(--text-secondary)]">Tipo</span>
+                    <span className="text-[var(--text-secondary)]">Nome</span>
+                    <span className="text-[var(--text-secondary)]">Valor</span>
+                    <span className="font-mono text-[var(--text-primary)]">CNAME</span>
+                    <span className="font-mono text-[var(--text-primary)]">{domainState.domain}</span>
+                    <span className="font-mono text-[var(--text-primary)]">pik.bio</span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  loading={saving === "domain-remove"}
+                  onClick={async () => {
+                    setSaving("domain-remove");
+                    await fetch("/api/custom-domain", { method: "DELETE", credentials: "include" });
+                    setSaving(null);
+                    setDomainState({ domain: null, hostnameId: null, status: null, sslStatus: null });
+                    setDomainInput("");
+                    showToast("Dominio removido");
+                  }}
+                >
+                  Remover dominio
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-5 space-y-4">
+                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                  Conecte um dominio proprio para sua loja. Apos conectar, configure o CNAME no seu provedor de DNS.
+                </p>
+                <div className="flex gap-3">
+                  <Input
+                    label="Seu dominio"
+                    value={domainInput}
+                    onChange={(event) => setDomainInput(event.target.value.toLowerCase())}
+                    placeholder="seudominio.com.br"
+                    className="min-w-0 flex-1"
+                  />
+                  <div className="flex items-end">
+                    <Button
+                      loading={saving === "domain-connect"}
+                      disabled={!domainInput.match(/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/)}
+                      onClick={async () => {
+                        setSaving("domain-connect");
+                        const response = await fetch("/api/custom-domain", {
+                          method: "POST",
+                          credentials: "include",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ domain: domainInput }),
+                        });
+                        const payload = await response.json().catch(() => ({}));
+                        setSaving(null);
+                        if (!response.ok) {
+                          showToast(payload.error ?? "Erro ao conectar dominio");
+                          return;
+                        }
+                        setDomainState(payload.data);
+                        showToast("Dominio conectado! Configure o DNS para ativar.");
+                      }}
+                    >
+                      Conectar dominio
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+        ) : (
+          <Card className="p-5">
+            <SectionTitle icon={Globe} title="Dominio" text="Dominio proprio para sua loja." />
+            <div className="mt-5 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4">
+              <p className="text-sm font-bold text-[var(--text-primary)]">Disponivel no Plano Pro</p>
+              <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
+                Faça upgrade para o Plano Pro para conectar seu proprio dominio e remover a marca d&apos;agua.
+              </p>
+              <Button className="mt-4" onClick={() => setActiveSection("plan")}>
+                Fazer upgrade
+              </Button>
+            </div>
+          </Card>
+        )
+      )}
 
       {activeSection === "plan" && (
         billing?.is_pro ? (

@@ -2,6 +2,7 @@ import type { StoreTheme } from "./theme";
 import type { ProductPageSection } from "@/lib/product-page-sections";
 
 export type Creator = {
+  plan?: "free" | "pro" | null;
   name: string;
   username: string;
   bio: string;

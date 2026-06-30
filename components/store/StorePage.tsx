@@ -8,6 +8,7 @@ import type { Creator, Product } from "@/lib/types";
 import type { StoreTheme } from "@/lib/theme";
 import {
   avatarSizePx,
+  coverHeightPx,
   fontVars,
   getThemeBackground,
   letterSpacingValue,
@@ -28,6 +29,7 @@ type StorePageProps = {
   embedded?: boolean;
   previewMode?: boolean;
   onProductClick?: (product: Product) => void;
+  hideBranding?: boolean;
 };
 
 function canUseOptimizedImage(src: string) {
@@ -42,6 +44,7 @@ export default function StorePage({
   embedded = false,
   previewMode = false,
   onProductClick,
+  hideBranding,
 }: StorePageProps) {
   const initialTheme = theme ?? creator.theme ?? THEME_PRESETS[creator.template ?? "cards"];
 
@@ -109,12 +112,14 @@ export default function StorePage({
             />
           ))}
         </section>
-        <footer className="mt-auto border-t px-1 py-6 text-center text-xs font-medium" style={{ borderColor: resolvedTheme.cardBorderColor, color: resolvedTheme.textSecondaryColor }}>
-          Criado com{" "}
-          <Link href={previewMode ? "#" : "/criar"} onClick={previewMode ? (event) => event.preventDefault() : undefined} className="font-semibold" style={{ color: resolvedTheme.textPrimaryColor }}>
-            Pikbio
-          </Link>
-        </footer>
+        {!hideBranding && (
+          <footer className="mt-auto border-t px-1 py-6 text-center text-xs font-medium" style={{ borderColor: resolvedTheme.cardBorderColor, color: resolvedTheme.textSecondaryColor }}>
+            Criado com{" "}
+            <Link href={previewMode ? "#" : "/criar"} onClick={previewMode ? (event) => event.preventDefault() : undefined} className="font-semibold" style={{ color: resolvedTheme.textPrimaryColor }}>
+              Pikbio
+            </Link>
+          </footer>
+        )}
       </div>
 
       {!embedded && (
@@ -145,12 +150,14 @@ export default function StorePage({
             </section>
           </div>
 
-          <footer className="mt-8 border-t px-1 py-6 text-center text-xs font-medium" style={{ borderColor: resolvedTheme.cardBorderColor, color: resolvedTheme.textSecondaryColor }}>
-            Criado com{" "}
-            <Link href={previewMode ? "#" : "/criar"} onClick={previewMode ? (event) => event.preventDefault() : undefined} className="font-semibold" style={{ color: resolvedTheme.textPrimaryColor }}>
-              Pikbio
-            </Link>
-          </footer>
+          {!hideBranding && (
+            <footer className="mt-8 border-t px-1 py-6 text-center text-xs font-medium" style={{ borderColor: resolvedTheme.cardBorderColor, color: resolvedTheme.textSecondaryColor }}>
+              Criado com{" "}
+              <Link href={previewMode ? "#" : "/criar"} onClick={previewMode ? (event) => event.preventDefault() : undefined} className="font-semibold" style={{ color: resolvedTheme.textPrimaryColor }}>
+                Pikbio
+              </Link>
+            </footer>
+          )}
         </div>
       )}
     </main>
@@ -160,8 +167,9 @@ export default function StorePage({
 function Cover({ creator, theme, desktop = false }: { creator: Creator; theme: StoreTheme; desktop?: boolean }) {
   if (!creator.coverImage) return null;
   const isImageUrl = creator.coverImage.startsWith("data:") || creator.coverImage.startsWith("http");
+  const coverH = coverHeightPx[theme.coverHeight] ?? 190;
   return (
-    <section className={`relative z-[1] aspect-[16/7] max-h-[190px] overflow-hidden ${desktop ? "mb-0 rounded-none" : "-mx-5 -mt-6 mb-0"}`}>
+    <section className={`relative z-[1] overflow-hidden ${desktop ? "mb-0 rounded-none" : "-mx-5 -mt-6 mb-0"}`} style={{ aspectRatio: "16/7", maxHeight: coverH }}>
       <div
         className="relative size-full bg-cover bg-center bg-no-repeat"
         style={{

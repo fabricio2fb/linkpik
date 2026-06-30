@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import DeleteProductDialog from "@/components/dashboard/DeleteProductDialog";
 import ProductForm from "@/components/editor/ProductForm";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -26,6 +27,7 @@ export default function ProductEditPage({ productId, title, description, product
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -54,7 +56,6 @@ export default function ProductEditPage({ productId, title, description, product
   }
 
   async function deleteProduct() {
-    if (!window.confirm("Tem certeza que deseja excluir este produto? Esta acao nao pode ser desfeita.")) return;
     setSaving(true);
     const response = await fetch(`/api/products/${productId}`, {
       method: "DELETE",
@@ -66,6 +67,7 @@ export default function ProductEditPage({ productId, title, description, product
       showToast(payload.error ?? "Erro ao excluir produto.");
       return;
     }
+    setShowDeleteDialog(false);
     showToast("Produto excluido");
     router.push(backHref);
     router.refresh();
@@ -101,7 +103,7 @@ export default function ProductEditPage({ productId, title, description, product
         </div>
         <div className="flex gap-2">
           {product && (
-            <Button variant="secondary" loading={saving} onClick={deleteProduct}>
+            <Button variant="secondary" onClick={() => setShowDeleteDialog(true)}>
               <Trash2 size={16} />
               Excluir
             </Button>
@@ -129,6 +131,13 @@ export default function ProductEditPage({ productId, title, description, product
           <div className="p-5 text-sm text-red-400">Produto nao encontrado.</div>
         )}
       </Card>
+      <DeleteProductDialog
+        open={showDeleteDialog}
+        productName={product?.name ?? ""}
+        loading={saving}
+        onConfirm={deleteProduct}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
       <Toast message={toast} />
     </div>
   );

@@ -6,8 +6,7 @@ import { mapApiCreator, mapApiProduct } from "@/lib/api-mappers";
 import { getPublicStore } from "@/lib/public-store";
 import type { Product } from "@/lib/types";
 
-export const revalidate = 60;
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type PublicProductPageProps = {
   params: Promise<{ username: string; "product-id": string }>;

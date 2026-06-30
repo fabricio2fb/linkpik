@@ -48,7 +48,7 @@ export async function getPublicStore(username: string) {
 
   const { data: creator, error: creatorError } = await supabase
     .from("creators")
-    .select("id, name, bio, avatar_url, cover_url, username, store_theme, suspended")
+    .select("id, name, bio, avatar_url, cover_url, username, store_theme, suspended, plan")
     .eq("username", username)
     .eq("is_active", true)
     .single();
