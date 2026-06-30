@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import { Eye, EyeOff } from "lucide-react";
-import { FormEvent, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import BrandLogo from "@/components/BrandLogo";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -120,6 +120,14 @@ export default function LoginPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginContent />
+    </Suspense>
   );
 }
 

@@ -101,7 +101,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" data-theme="light" suppressHydrationWarning>
+    <html lang="pt-BR" data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={`${plusJakarta.variable} ${dmSans.variable} ${playfair.variable} ${spaceGrotesk.variable} ${nunito.variable} ${syne.variable} ${inter.variable} ${oswald.variable} ${bebasNeue.variable} ${lora.variable} antialiased`}
       >
