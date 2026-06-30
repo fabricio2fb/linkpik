@@ -174,7 +174,7 @@ export default function Sidebar({ mobileOpen = false, onClose, creator }: Sideba
         {isPro ? (
           <div className="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-3 md:grid md:place-items-center xl:block xl:place-items-stretch">
             <div className="flex items-center gap-3 md:justify-center xl:justify-start">
-              <div className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[#FF4D6D] text-sm font-black text-white ring-2 ring-[#22C55E]/35">
+              <div className={`relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full text-sm font-black text-white ring-2 ring-[#22C55E]/35 ${creator?.avatar_url ? "" : "bg-[#FF4D6D]"}`}>
                 {creator?.avatar_url ? <Image src={creator.avatar_url} alt="" fill sizes="40px" className="object-contain" unoptimized={!creator.avatar_url.startsWith("http")} /> : getInitials(creatorName)}
               </div>
               <div className="min-w-0 md:hidden xl:block">

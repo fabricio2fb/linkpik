@@ -495,7 +495,7 @@ export default function ConfiguracoesPage() {
             </div>
             <div className="grid gap-4 md:grid-cols-[96px_1fr]">
               <div className="grid content-start justify-items-center gap-2">
-                <div className="grid size-20 place-items-center overflow-hidden rounded-full bg-[#FF4D6D] text-lg font-black text-white">
+                <div className={`grid size-20 place-items-center overflow-hidden rounded-full text-lg font-black text-white ${creator.avatar_url ? "" : "bg-[#FF4D6D]"}`}>
                   {creator.avatar_url ? <img src={creator.avatar_url} alt="" className="size-full object-contain" /> : creator.name.slice(0, 2).toUpperCase()}
                 </div>
                 <label className="grid cursor-pointer justify-items-center gap-1 text-center text-xs font-bold text-[#FF4D6D]">

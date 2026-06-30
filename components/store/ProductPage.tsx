@@ -365,7 +365,7 @@ function CreatorSection({
   return (
     <section className={`mx-5 rounded-2xl border p-4 ${forceMobile ? "" : "lg:mx-0"} ${className}`} style={sectionStyle}>
       <div className="flex items-center gap-3">
-        <div className="relative grid size-14 place-items-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ backgroundColor: creator.avatarColor }}>
+        <div className="relative grid size-14 place-items-center overflow-hidden rounded-full text-sm font-bold text-white" style={{ backgroundColor: creator.avatarImage ? "transparent" : creator.avatarColor }}>
           {creator.avatarImage ? (
             <Image src={creator.avatarImage} alt="" fill sizes="56px" className="object-contain" unoptimized={!canUseOptimizedImage(creator.avatarImage)} />
           ) : (

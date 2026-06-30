@@ -385,7 +385,7 @@ export default function StoreEditor({
             <div className="grid gap-2 text-sm font-medium text-[var(--text-primary)]">
               Foto de perfil
               <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-[10px] border border-dashed border-[var(--border-subtle)] bg-[var(--bg-input)] px-4 text-[var(--text-secondary)] transition hover:bg-[var(--bg-elevated)]">
-                <span className="relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--bg-elevated)] text-xs font-bold text-[var(--text-primary)]">
+                <span className={`relative grid size-10 shrink-0 place-items-center overflow-hidden rounded-full text-xs font-bold text-[var(--text-primary)] ${creator.avatarImage ? "" : "bg-[var(--bg-elevated)]"}`}>
                   {creator.avatarImage ? (
                     <Image src={creator.avatarImage} alt="" fill sizes="40px" className="object-contain" unoptimized={!canUseOptimizedImage(creator.avatarImage)} />
                   ) : (

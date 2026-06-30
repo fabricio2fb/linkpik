@@ -231,7 +231,7 @@ function ProfileHeader({
     borderWidth: theme.avatarBorderWidth,
     borderColor: theme.avatarBorderColor,
     borderStyle: theme.avatarBorderWidth ? "solid" : "none",
-    background: `radial-gradient(circle at 34% 28%, rgba(255,255,255,0.42), transparent 24%), ${creator.avatarColor || theme.accentColor}`,
+    background: creator.avatarImage ? "transparent" : `radial-gradient(circle at 34% 28%, rgba(255,255,255,0.42), transparent 24%), ${creator.avatarColor || theme.accentColor}`,
     boxShadow: theme.avatarShadow ? `0 10px 34px ${theme.accentColor}44` : "none",
     clipPath: theme.avatarShape === "hexagon" ? "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)" : undefined,
     borderRadius: theme.avatarShape === "circle" ? 999 : theme.avatarShape === "square" ? 8 : theme.avatarShape === "rounded" ? 20 : 0,
