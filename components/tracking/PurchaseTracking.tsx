@@ -24,25 +24,33 @@ export default function PurchaseTracking({ orderId, value, currency, productTitl
     const key = `pikbio_purchase_${orderId}`;
     if (sessionStorage.getItem(key)) return;
 
+    const fired = { fbq: false, gtag: false, ttq: false };
     let attempts = 0;
+
     const interval = window.setInterval(() => {
       attempts += 1;
-      if (window.fbq) {
+
+      if (!fired.fbq && window.fbq) {
         window.fbq("track", "Purchase", { value, currency, content_name: productTitle, content_ids: [orderId] });
+        fired.fbq = true;
       }
-      if (window.gtag) {
+
+      if (!fired.gtag && window.gtag) {
         window.gtag("event", "purchase", {
           transaction_id: orderId,
           value,
           currency,
           items: [{ item_name: productTitle, price: value, quantity: 1 }],
         });
-      }
-      if (window.ttq?.track) {
-        window.ttq.track("CompletePayment", { value, currency, content_name: productTitle, content_id: orderId });
+        fired.gtag = true;
       }
 
-      if (window.fbq || window.gtag || window.ttq?.track || attempts >= 10) {
+      if (!fired.ttq && window.ttq?.track) {
+        window.ttq.track("CompletePayment", { value, currency, content_name: productTitle, content_id: orderId });
+        fired.ttq = true;
+      }
+
+      if ((fired.fbq && fired.gtag && fired.ttq) || attempts >= 10) {
         sessionStorage.setItem(key, "1");
         window.clearInterval(interval);
       }

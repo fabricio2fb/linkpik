@@ -175,7 +175,7 @@ export default function LandingBelowFold() {
         <SectionIntro
           eyebrow="Preco"
           title="Comece sem mensalidade. Evolua quando vender mais."
-          text="O plano gratis cobre o essencial para validar sua loja. O Pro remove limites, reduz taxa e libera dominio proprio."
+          text="O plano gratis cobre o essencial para validar sua loja. O Pro remove limites e reduz a taxa."
         />
 
         <div className="mx-auto mt-10 grid max-w-5xl gap-5 lg:grid-cols-2">
@@ -186,7 +186,7 @@ export default function LandingBelowFold() {
             suffix="/mes"
             description="Sem mensalidade. Pague apenas quando vender."
             features={["Loja na bio", "Ate 5 produtos", "Checkout Mercado Pago", "Upsell basico", "Analytics basico"]}
-            missing={["Dominio proprio", "Produtos ilimitados", "Integracoes de pixel", "Remover marca d'agua"]}
+            missing={["Produtos ilimitados", "Integracoes de pixel", "Remover marca d'agua"]}
             cta="Comecar gratis"
           />
           <PricingCard
@@ -196,7 +196,7 @@ export default function LandingBelowFold() {
             price="R$ 29"
             suffix="/mes"
             description="Mensal, sem fidelidade."
-            features={["Tudo do Free", "Produtos ilimitados", "Todos os temas", "Dominio proprio", "Meta Pixel, GA e TikTok Pixel", "Taxa reduzida", "Remover marca d'agua"]}
+            features={["Tudo do Free", "Produtos ilimitados", "Todos os temas", "Meta Pixel, GA e TikTok Pixel", "Taxa reduzida", "Remover marca d'agua"]}
             cta="Fazer upgrade"
           />
         </div>

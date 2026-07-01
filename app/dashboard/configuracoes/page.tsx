@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, Bell, CheckCircle2, CreditCard, ExternalLink, ImagePlus, KeyRound, Link2, Lock, Mail, Save, User, X, Zap } from "lucide-react";
+import { AlertTriangle, Bell, CheckCircle2, ChevronRight, CreditCard, ExternalLink, Eye, EyeOff, ImagePlus, KeyRound, Link2, Lock, Mail, Save, ScrollText, Send, User, X, XCircle, Zap } from "lucide-react";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -29,10 +29,8 @@ type Settings = {
   bank_document?: string | null;
   bank_holder?: string | null;
   notify_new_sale?: boolean;
-  notify_pix_expired?: boolean;
   notify_daily_summary?: boolean;
   notify_weekly_summary?: boolean;
-  notify_product_news?: boolean;
   notify_whatsapp_enabled?: boolean;
   notify_whatsapp_number?: string | null;
   notify_push_enabled?: boolean;
@@ -78,10 +76,8 @@ type EfipayStatus = {
 
 const emptySettings: Settings = {
   notify_new_sale: true,
-  notify_pix_expired: true,
   notify_daily_summary: false,
   notify_weekly_summary: false,
-  notify_product_news: true,
   notify_whatsapp_enabled: false,
   notify_push_enabled: false,
   webhook_events: [],
@@ -108,6 +104,33 @@ export default function ConfiguracoesPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarUploadError, setAvatarUploadError] = useState("");
   const [toast, setToast] = useState<string | null>(null);
+  const [showTokens, setShowTokens] = useState<Record<string, boolean>>({});
+  const [webhookTesting, setWebhookTesting] = useState(false);
+  const [webhookTestResult, setWebhookTestResult] = useState<{
+    success: boolean;
+    statusCode: number | null;
+    responseTimeMs: number;
+    responseBody: string | null;
+    error: string | null;
+  } | null>(null);
+  const [webhookLogs, setWebhookLogs] = useState<WebhookLog[]>([]);
+  const [webhookLogsTotal, setWebhookLogsTotal] = useState(0);
+  const [webhookLogsLoading, setWebhookLogsLoading] = useState(false);
+  const [selectedLog, setSelectedLog] = useState<WebhookLog | null>(null);
+
+type WebhookLog = {
+  id: string;
+  event_type: string;
+  webhook_url: string;
+  request_payload: unknown;
+  response_status: number | null;
+  response_body: string | null;
+  response_time_ms: number;
+  success: boolean;
+  error_message: string | null;
+  is_test: boolean;
+  created_at: string;
+};
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -180,9 +203,26 @@ export default function ConfiguracoesPage() {
     };
   }, [activeSection]);
 
+  useEffect(() => {
+    if (activeSection === "integrations") {
+      loadWebhookLogs();
+    }
+  }, [activeSection]);
+
   function showToast(message: string) {
     setToast(message);
     window.setTimeout(() => setToast(null), 2200);
+  }
+
+  async function loadWebhookLogs() {
+    setWebhookLogsLoading(true);
+    const response = await fetch("/api/webhooks/logs?limit=20", { credentials: "include" });
+    const payload = await response.json().catch(() => ({}));
+    setWebhookLogsLoading(false);
+    if (payload.data?.logs) {
+      setWebhookLogs(payload.data.logs);
+      setWebhookLogsTotal(payload.data.total ?? 0);
+    }
   }
 
   function normalizeNullable(value?: string | null) {
@@ -464,7 +504,7 @@ export default function ConfiguracoesPage() {
       <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
         <div>
           <h1 className="font-heading text-3xl font-extrabold text-[var(--text-primary)]">Configuracoes</h1>
-          <p className="mt-1 text-sm text-[var(--text-secondary)]">Conta, pagamentos, notificacoes, dominio, integracoes e plano.</p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">Conta, pagamentos, notificacoes, integracoes e plano.</p>
         </div>
         <Badge tone={billing?.is_pro ? "success" : "neutral"}>{billing?.is_pro ? "Plano Pro" : "Plano Free"}</Badge>
       </header>
@@ -615,10 +655,8 @@ export default function ConfiguracoesPage() {
         <SectionTitle icon={Bell} title="Notificacoes" text="Eventos enviados para voce e para a operacao." />
         <div className="mt-5 grid gap-3 md:grid-cols-2">
           <Toggle label="Nova venda" checked={Boolean(settings.notify_new_sale)} onChange={(checked) => setSettings((current) => ({ ...current, notify_new_sale: checked }))} />
-          <Toggle label="Pagamento pendente" checked={Boolean(settings.notify_pix_expired)} onChange={(checked) => setSettings((current) => ({ ...current, notify_pix_expired: checked }))} />
           <Toggle label="Resumo diario" checked={Boolean(settings.notify_daily_summary)} onChange={(checked) => setSettings((current) => ({ ...current, notify_daily_summary: checked }))} />
           <Toggle label="Resumo semanal" checked={Boolean(settings.notify_weekly_summary)} onChange={(checked) => setSettings((current) => ({ ...current, notify_weekly_summary: checked }))} />
-          <Toggle label="Novidades de produto" checked={Boolean(settings.notify_product_news)} onChange={(checked) => setSettings((current) => ({ ...current, notify_product_news: checked }))} />
           <Toggle label="Push no navegador" checked={Boolean(settings.notify_push_enabled)} onChange={togglePushNotifications} />
         </div>
         {FEATURE_WHATSAPP_NOTIFICATIONS && (
@@ -631,10 +669,8 @@ export default function ConfiguracoesPage() {
         )}
         <Button className="mt-5" loading={saving === "notifications"} onClick={() => patchSettings({
           notify_new_sale: settings.notify_new_sale,
-          notify_pix_expired: settings.notify_pix_expired,
           notify_daily_summary: settings.notify_daily_summary,
           notify_weekly_summary: settings.notify_weekly_summary,
-          notify_product_news: settings.notify_product_news,
           notify_push_enabled: settings.notify_push_enabled,
           ...(FEATURE_WHATSAPP_NOTIFICATIONS ? {
             notify_whatsapp_enabled: settings.notify_whatsapp_enabled,
@@ -649,7 +685,70 @@ export default function ConfiguracoesPage() {
           <Input label="Meta Pixel ID" value={settings.meta_pixel_id ?? ""} onChange={(event) => setSettings((current) => ({ ...current, meta_pixel_id: event.target.value }))} />
           <Input label="Google Analytics Measurement ID" value={settings.google_analytics_measurement_id ?? ""} onChange={(event) => setSettings((current) => ({ ...current, google_analytics_measurement_id: event.target.value }))} />
           <Input label="TikTok Pixel ID" value={settings.tiktok_pixel_id ?? ""} onChange={(event) => setSettings((current) => ({ ...current, tiktok_pixel_id: event.target.value }))} />
-          <Input label="Webhook URL" value={settings.webhook_url ?? ""} onChange={(event) => setSettings((current) => ({ ...current, webhook_url: event.target.value }))} placeholder="https://..." />
+          <div className="md:col-span-2 grid gap-4 md:grid-cols-2">
+            <Input
+              label="Meta Conversions API Token"
+              type={showTokens.meta_pixel_token ? "text" : "password"}
+              value={settings.meta_pixel_token ?? ""}
+              onChange={(event) => setSettings((current) => ({ ...current, meta_pixel_token: event.target.value }))}
+              placeholder={settings.meta_pixel_token ? "Substituir token..." : "••••••••"}
+              suffix={
+                <button type="button" tabIndex={-1} className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)]" onClick={() => setShowTokens((current) => ({ ...current, meta_pixel_token: !current.meta_pixel_token }))}>
+                  {showTokens.meta_pixel_token ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              }
+            />
+            <Input
+              label="TikTok Events API Token"
+              type={showTokens.tiktok_pixel_token ? "text" : "password"}
+              value={settings.tiktok_pixel_token ?? ""}
+              onChange={(event) => setSettings((current) => ({ ...current, tiktok_pixel_token: event.target.value }))}
+              placeholder={settings.tiktok_pixel_token ? "Substituir token..." : "••••••••"}
+              suffix={
+                <button type="button" tabIndex={-1} className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)]" onClick={() => setShowTokens((current) => ({ ...current, tiktok_pixel_token: !current.tiktok_pixel_token }))}>
+                  {showTokens.tiktok_pixel_token ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              }
+            />
+          </div>
+          <div className="md:col-span-2 grid gap-2">
+            <div className="flex gap-3 items-end">
+              <Input label="Webhook URL" value={settings.webhook_url ?? ""} onChange={(event) => { setSettings((current) => ({ ...current, webhook_url: event.target.value })); setWebhookTestResult(null); }} placeholder="https://..." className="min-w-0 flex-1" />
+              <Button
+                variant="secondary"
+                loading={webhookTesting}
+                disabled={!settings.webhook_url?.trim()}
+                onClick={async () => {
+                  setWebhookTesting(true);
+                  setWebhookTestResult(null);
+                  const response = await fetch("/api/webhooks/test", {
+                    method: "POST",
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      webhook_url: settings.webhook_url,
+                      webhook_secret: settings.webhook_secret || undefined,
+                    }),
+                  });
+                  const payload = await response.json().catch(() => ({}));
+                  setWebhookTesting(false);
+                  setWebhookTestResult(payload.data ?? { success: false, error: "Erro ao testar" });
+                }}
+              >
+                <Send size={14} />
+                Testar webhook
+              </Button>
+            </div>
+            {webhookTestResult && (
+              <div className={`flex items-center gap-2 text-xs ${webhookTestResult.success ? "text-green-400" : "text-red-400"}`}>
+                {webhookTestResult.success ? (
+                  <><CheckCircle2 size={14} /> Recebido {webhookTestResult.statusCode} em {webhookTestResult.responseTimeMs}ms</>
+                ) : (
+                  <><XCircle size={14} /> {webhookTestResult.error ?? `HTTP ${webhookTestResult.statusCode}`}</>
+                )}
+              </div>
+            )}
+          </div>
           <div className="grid gap-2 md:col-span-2">
             <Input label="Eventos do webhook" value={(settings.webhook_events ?? []).join(", ")} onChange={(event) => setSettings((current) => ({ ...current, webhook_events: event.target.value.split(",").map((item) => item.trim()).filter(Boolean) }))} placeholder="order.paid, order.pending, order.refused, order.canceled, order.refunded, access.granted" />
             <div className="flex flex-wrap gap-2">
@@ -663,12 +762,133 @@ export default function ConfiguracoesPage() {
         </div>
         <Button className="mt-5" loading={saving === "integrations"} onClick={() => patchSettings({
           meta_pixel_id: normalizeNullable(settings.meta_pixel_id),
+          meta_pixel_token: normalizeNullable(settings.meta_pixel_token),
           google_analytics_measurement_id: normalizeNullable(settings.google_analytics_measurement_id),
           tiktok_pixel_id: normalizeNullable(settings.tiktok_pixel_id),
+          tiktok_pixel_token: normalizeNullable(settings.tiktok_pixel_token),
           webhook_url: normalizeNullable(settings.webhook_url),
           webhook_events: settings.webhook_events ?? [],
           webhook_secret: normalizeNullable(settings.webhook_secret),
         }, "Integracoes salvas", "integrations")}><Save size={16} />Salvar integracoes</Button>
+
+        <hr className="my-6 border-[var(--border-subtle)]" />
+
+        <div>
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <ScrollText size={18} className="text-[var(--text-tertiary)]" />
+              <h3 className="text-sm font-bold text-[var(--text-primary)]">Logs de Webhook</h3>
+              {webhookLogsTotal > 0 && <span className="text-xs text-[var(--text-tertiary)]">({webhookLogsTotal} registros)</span>}
+            </div>
+            <Button variant="secondary" loading={webhookLogsLoading} onClick={loadWebhookLogs}>
+              Atualizar
+            </Button>
+          </div>
+
+          {webhookLogs.length === 0 && !webhookLogsLoading && (
+            <div className="mt-4 rounded-[8px] border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 text-center text-sm text-[var(--text-tertiary)]">
+              Nenhum webhook enviado ainda. Os registros aparecerao apos o primeiro disparo ou ao usar o botao "Testar webhook".
+            </div>
+          )}
+
+          {webhookLogs.length > 0 && (
+            <div className="mt-4 overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="text-[var(--text-tertiary)] border-b border-[var(--border-subtle)]">
+                    <th className="pb-2 pr-3 font-medium">Data</th>
+                    <th className="pb-2 pr-3 font-medium">Evento</th>
+                    <th className="pb-2 pr-3 font-medium">Status</th>
+                    <th className="pb-2 pr-3 font-medium">Tempo</th>
+                    <th className="pb-2 font-medium"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {webhookLogs.map((log) => (
+                    <tr key={log.id} className="border-b border-[var(--border-subtle)] last:border-0">
+                      <td className="py-2.5 pr-3 text-[var(--text-secondary)] whitespace-nowrap">
+                        {new Date(log.created_at).toLocaleString("pt-BR")}
+                      </td>
+                      <td className="py-2.5 pr-3">
+                        <span className="font-mono text-[var(--text-primary)]">{log.event_type}</span>
+                        {log.is_test && <Badge tone="neutral" className="ml-1.5">Teste</Badge>}
+                      </td>
+                      <td className="py-2.5 pr-3">
+                        {log.success ? (
+                          <span className="text-green-400 flex items-center gap-1"><CheckCircle2 size={12} />{log.response_status}</span>
+                        ) : (
+                          <span className="text-red-400 flex items-center gap-1"><XCircle size={12} />{String(log.response_status ?? log.error_message ?? "Falha")}</span>
+                        )}
+                      </td>
+                      <td className="py-2.5 pr-3 text-[var(--text-secondary)]">
+                        {log.response_time_ms}ms
+                      </td>
+                      <td className="py-2.5">
+                        <button
+                          type="button"
+                          className="text-[#FF4D6D] hover:text-[#FF4D6D]/80 flex items-center gap-1 text-xs font-medium"
+                          onClick={() => setSelectedLog(log)}
+                        >
+                          Detalhes <ChevronRight size={12} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <Modal
+            open={!!selectedLog}
+            onClose={() => setSelectedLog(null)}
+            title="Detalhes do webhook"
+            maxWidth="max-w-lg"
+          >
+            {selectedLog && (
+              <div className="space-y-4 p-1 text-sm">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Evento</p>
+                    <p className="font-mono text-[var(--text-primary)]">{selectedLog.event_type}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Data</p>
+                    <p className="text-[var(--text-primary)]">{new Date(selectedLog.created_at).toLocaleString("pt-BR")}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Status HTTP</p>
+                    <p className="text-[var(--text-primary)]">{selectedLog.response_status ?? "-"}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Tempo de resposta</p>
+                    <p className="text-[var(--text-primary)]">{selectedLog.response_time_ms}ms</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-[var(--text-tertiary)] mb-1">URL</p>
+                  <p className="font-mono text-xs break-all text-[var(--text-primary)]">{selectedLog.webhook_url}</p>
+                </div>
+                {selectedLog.error_message && (
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Erro</p>
+                    <p className="text-red-400 text-xs">{selectedLog.error_message}</p>
+                  </div>
+                )}
+                <div>
+                  <p className="text-xs text-[var(--text-tertiary)] mb-1">Payload enviado</p>
+                  <pre className="rounded-[6px] bg-[var(--bg-elevated)] p-3 text-xs overflow-auto max-h-40 text-[var(--text-primary)]">{JSON.stringify(selectedLog.request_payload, null, 2)}</pre>
+                </div>
+                {selectedLog.response_body && (
+                  <div>
+                    <p className="text-xs text-[var(--text-tertiary)] mb-1">Resposta recebida</p>
+                    <pre className="rounded-[6px] bg-[var(--bg-elevated)] p-3 text-xs overflow-auto max-h-40 text-[var(--text-primary)]">{selectedLog.response_body}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+          </Modal>
+        </div>
       </Card>}
 
       {activeSection === "plan" && (

@@ -463,3 +463,119 @@ export function welcomeEmailText(data: WelcomeEmailData): string {
     "Se tiver duvidas, acesse nossa central de ajuda: ${appUrl}/contato",
   ].join("\n");
 }
+
+export type NewSaleEmailData = {
+  creatorName: string;
+  buyerName: string;
+  productTitle: string;
+  amount: number;
+  currency: string;
+  storeUsername: string;
+  isPhysical: boolean;
+};
+
+export function newSaleEmailHtml(data: NewSaleEmailData): string {
+  const creator = safe(data.creatorName);
+  const buyer = safe(data.buyerName);
+  const title = safe(data.productTitle);
+  const amount = data.amount.toFixed(2);
+  const appUrl = safe(process.env.NEXT_PUBLIC_APP_URL ?? "https://pik.bio");
+  const dashboardUrl = `${appUrl}/dashboard`;
+
+  return `
+<table cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#f4f4f4;font-family:Arial,Helvetica,sans-serif;">
+  <tr>
+    <td align="center" style="padding:24px 16px;">
+      <table cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;width:100%;background:#ffffff;border-radius:8px;overflow:hidden;">
+
+        <tr>
+          <td align="center" style="background:#0a0a0a;padding:24px 24px 20px;">
+            <table cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;">
+              <tr>
+                <td valign="middle" style="padding-right:10px;">
+                  <img src="${appUrl}/logo-pikbio.png" alt="" width="32" height="32" style="display:block;border:0;width:32px;height:32px;" />
+                </td>
+                <td valign="middle" style="font-size:22px;font-weight:900;color:#ffffff;letter-spacing:-0.5px;">
+                  Pikbio<span style="color:#FF4D6D;">.</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <tr>
+          <td align="center" style="background:#0a0a0a;padding:0 24px 32px;">
+            <span style="font-size:40px;line-height:1;">&#128176;</span>
+            <p style="margin:12px 0 0;font-size:24px;font-weight:900;color:#ffffff;letter-spacing:-0.5px;">
+              Nova venda${data.isPhysical ? " (produto fisico)" : ""}!
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="padding:32px 24px;font-size:15px;color:#555555;line-height:1.6;">
+            <p style="margin:0 0 16px;">Ola <strong>${creator}</strong>,</p>
+            <p style="margin:0 0 16px;">Voce acabou de receber uma venda:</p>
+
+            <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 20px;background:#fafafa;border-radius:6px;">
+              <tr>
+                <td style="padding:16px;">
+                  <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;color:#888888;">Produto</td>
+                      <td style="padding:4px 0;font-size:13px;font-weight:700;color:#333333;text-align:right;">${title}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;color:#888888;">Comprador</td>
+                      <td style="padding:4px 0;font-size:13px;font-weight:700;color:#333333;text-align:right;">${buyer}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding:4px 0;font-size:13px;color:#888888;">Valor</td>
+                      <td style="padding:4px 0;font-size:13px;font-weight:700;color:#22C55E;text-align:right;">R$ ${amount}</td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+
+            <p style="margin:0;">Acesse o dashboard para ver os detalhes:</p>
+            <p style="margin:12px 0 0;text-align:center;">
+              <a href="${dashboardUrl}" style="display:inline-block;padding:12px 24px;background:#FF4D6D;color:#ffffff;text-decoration:none;font-weight:700;border-radius:6px;font-size:14px;">
+                Ir para o dashboard
+              </a>
+            </p>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="background:#fafafa;border-top:1px solid #eeeeee;padding:16px 24px;font-size:11px;color:#aaaaaa;text-align:center;">
+            Voce recebeu este email porque tem notificacoes ativas no Pikbio.<br/>
+            <a href="${appUrl}/dashboard/configuracoes" style="color:#FF4D6D;text-decoration:underline;">Gerenciar notificacoes</a>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>`;
+}
+
+export function newSaleEmailText(data: NewSaleEmailData): string {
+  const statusText = data.isPhysical ? " (produto fisico)" : "";
+  return [
+    `Ola, ${data.creatorName}!`,
+    "",
+    `Nova venda${statusText} realizada!`,
+    "",
+    `Produto: ${data.productTitle}`,
+    `Comprador: ${data.buyerName}`,
+    `Valor: R$ ${data.amount.toFixed(2)}`,
+    "",
+    "Acesse o dashboard para ver os detalhes:",
+    `${process.env.NEXT_PUBLIC_APP_URL ?? "https://pik.bio"}/dashboard`,
+    "",
+    "---",
+    "Voce recebeu este email porque tem notificacoes ativas no Pikbio.",
+    `Gerencie: ${process.env.NEXT_PUBLIC_APP_URL ?? "https://pik.bio"}/dashboard/configuracoes`,
+  ].join("\n");
+}

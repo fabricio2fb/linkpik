@@ -2,6 +2,8 @@ import { Resend } from "resend";
 import {
   accessEmailHtml,
   accessEmailText,
+  newSaleEmailHtml,
+  newSaleEmailText,
   notificationHtml,
   notificationText,
   physicalOrderHtml,
@@ -9,6 +11,7 @@ import {
   welcomeEmailHtml,
   welcomeEmailText,
 } from "@/lib/api/email-templates";
+import type { NewSaleEmailData } from "@/lib/api/email-templates";
 
 let resend: Resend | null = null;
 
@@ -94,5 +97,15 @@ export async function sendWelcomeEmail(params: {
     subject: "Bem-vindo ao Pikbio!",
     html: welcomeEmailHtml({ name: params.name, username: params.username }),
     text: welcomeEmailText({ name: params.name, username: params.username }),
+  });
+}
+
+export async function sendNewSaleEmail(params: NewSaleEmailData & { to: string }) {
+  await getResend().emails.send({
+    from: process.env.RESEND_FROM_EMAIL!,
+    to: params.to,
+    subject: `Nova venda realizada${params.isPhysical ? " (produto fisico)" : ""}!`,
+    html: newSaleEmailHtml(params),
+    text: newSaleEmailText(params),
   });
 }

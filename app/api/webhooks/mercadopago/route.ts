@@ -239,6 +239,10 @@ export async function POST(request: Request) {
           type: "new_sale",
           title: "Novo pedido fisico aprovado",
           body: `Prepare o envio de ${product?.title ?? "produto"}.`,
+          buyerName: order.buyer_name,
+          productTitle: product?.title ?? "Produto Pikbio",
+          productAmount: Number(order.amount ?? 0),
+          isPhysical: true,
         });
       } else {
         const access = generateAccessToken();
@@ -273,6 +277,9 @@ export async function POST(request: Request) {
           type: "new_sale",
           title: "Nova venda aprovada",
           body: `Pagamento aprovado para ${product?.title ?? "produto"}.`,
+          buyerName: order.buyer_name,
+          productTitle: product?.title ?? "Produto Pikbio",
+          productAmount: Number(order.amount ?? 0),
         });
       }
 
