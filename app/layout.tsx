@@ -86,13 +86,46 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Pikbio",
-  description: "Link na bio com loja integrada para criadores brasileiros.",
+  metadataBase: new URL("https://pik.bio"),
+  title: {
+    default: "Pikbio  Transforme sua bio em uma loja digital",
+    template: "%s | Pikbio",
+  },
+  description:
+    "Pikbio junta página de vendas, link na bio, checkout, upsell e entrega digital em uma experiência simples, bonita e pronta para converter seguidores em clientes.",
+  keywords: [
+    "link na bio",
+    "loja na bio",
+    "checkout mercado pago",
+    "produtos digitais",
+    "linktree brasileiro",
+  ],
   icons: {
     icon: "/logo-pikbio.png",
     shortcut: "/logo-pikbio.png",
     apple: "/logo-pikbio.png",
   },
+  openGraph: {
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Pikbio",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Pikbio",
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  description:
+    "Plataforma brasileira que transforma sua bio em uma loja digital com link na bio, checkout, upsell e entrega de produtos digitais.",
+  url: "https://pik.bio",
+  logo: "https://pik.bio/logo-pikbio.png",
 };
 
 export default function RootLayout({
@@ -102,6 +135,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR" data-theme="light" data-scroll-behavior="smooth" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      </head>
       <body
         className={`${plusJakarta.variable} ${dmSans.variable} ${playfair.variable} ${spaceGrotesk.variable} ${nunito.variable} ${syne.variable} ${inter.variable} ${oswald.variable} ${bebasNeue.variable} ${lora.variable} antialiased`}
       >
