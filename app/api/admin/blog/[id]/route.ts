@@ -44,12 +44,30 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
     const supabase = createSupabaseService();
 
-    const { data: existing } = await supabase.from("blog_posts").select("id, slug, published_at").eq("slug", parsed.data.slug).maybeSingle();
+    const [{ data: current }, { data: existing }] = await Promise.all([
+      supabase.from("blog_posts").select("id, external_id, slug, published_at, metadata").eq("id", id).single(),
+      supabase.from("blog_posts").select("id, slug, published_at").eq("slug", parsed.data.slug).maybeSingle(),
+    ]);
+
+    if (!current) throw new ApiError(404, "Post nao encontrado");
     if (existing && existing.id !== id) throw new ApiError(409, "Ja existe outro post com este slug");
 
     const now = new Date().toISOString();
-    const wasDraft = !existing?.published_at;
-    const publishedAt = parsed.data.status === "published" && wasDraft ? now : existing?.published_at;
+    const currentMetadata =
+      current.metadata && typeof current.metadata === "object" && !Array.isArray(current.metadata)
+        ? current.metadata as Record<string, unknown>
+        : {};
+    const isImportedPost = Boolean(current.external_id) || currentMetadata.source === "generator";
+    const nextMetadata = isImportedPost
+      ? {
+          ...metadata,
+          source: "generator",
+          importedAt: metadata.importedAt ?? currentMetadata.importedAt ?? null,
+          lastManualEditAt: now,
+        }
+      : metadata;
+    const wasDraft = !current.published_at;
+    const publishedAt = parsed.data.status === "published" && wasDraft ? now : current.published_at;
 
     const { data: post, error } = await supabase.from("blog_posts").update({
       title: parsed.data.title,
@@ -57,7 +75,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       excerpt: parsed.data.excerpt || null,
       cover_image_url: parsed.data.coverImageUrl || null,
       content_html: cleanHtml,
-      metadata,
+      metadata: nextMetadata,
       status: parsed.data.status,
       published_at: publishedAt,
       updated_at: now,

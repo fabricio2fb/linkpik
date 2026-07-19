@@ -9,6 +9,7 @@ import {
   Shield,
   DollarSign,
   FileText,
+  Bot,
   LogOut,
 } from "lucide-react"
 
@@ -19,7 +20,13 @@ const NAV_ITEMS = [
   { href: "/admin/exclusao-dados", label: "Privacidade", icon: Shield },
   { href: "/admin/financeiro", label: "Financeiro", icon: DollarSign },
   { href: "/admin/blog", label: "Blog", icon: FileText },
+  { href: "/admin/blogauto", label: "Blog Auto", icon: Bot },
 ]
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/admin") return pathname === "/admin";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function AdminSidebar() {
   const pathname = usePathname()
@@ -49,10 +56,7 @@ export default function AdminSidebar() {
       </div>
       <nav className="flex gap-2 overflow-x-auto px-3 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/admin"
-              ? pathname === "/admin"
-              : pathname.startsWith(item.href)
+          const isActive = isActivePath(pathname, item.href)
 
           return (
             <Link
@@ -82,10 +86,7 @@ export default function AdminSidebar() {
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3">
         {NAV_ITEMS.map((item) => {
-          const isActive =
-            item.href === "/admin"
-              ? pathname === "/admin"
-              : pathname.startsWith(item.href)
+          const isActive = isActivePath(pathname, item.href)
 
           return (
             <Link
