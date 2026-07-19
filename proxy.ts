@@ -5,7 +5,7 @@ import { FEATURE_PHYSICAL_PRODUCT } from "@/lib/feature-flags";
 
 const PUBLIC_ROUTES = ["/", "/login", "/registro", "/lojaexemplo", "/recuperar-senha"];
 const PUBLIC_API_PREFIXES = ["/api/public", "/api/webhooks", "/api/analytics/track", "/api/access"];
-const PUBLIC_API_EXACT = ["/api/auth/session", "/api/auth/register", "/api/auth/rate-check", "/api/auth/callback", "/api/orders", "/api/docs"];
+const PUBLIC_API_EXACT = ["/api/auth/session", "/api/auth/register", "/api/auth/rate-check", "/api/auth/callback", "/api/orders", "/api/docs", "/api/blog/import"];
 const RESERVED_PUBLIC_SLUGS = new Set([
   "api",
   "dashboard",
@@ -63,7 +63,9 @@ export async function proxy(request: NextRequest) {
     return withSecurityHeaders(NextResponse.redirect(new URL("/dashboard", request.url)));
   }
 
-  if (pathname.startsWith("/api")) {
+  const isBlogImportApi = pathname === "/api/blog/import";
+
+  if (pathname.startsWith("/api") && !isBlogImportApi) {
     const origin = request.headers.get("origin") ?? "";
     const allowed = [process.env.NEXT_PUBLIC_APP_URL, "http://localhost:3000"].filter(Boolean);
     if (origin && !allowed.includes(origin)) {

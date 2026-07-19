@@ -42,7 +42,7 @@ describe("POST /api/blog/import", () => {
         slug: "pikbio",
         domain: "pik.bio",
       },
-      message: "Conexao realizada com sucesso.",
+      message: "Conexão realizada com sucesso.",
     });
   });
 

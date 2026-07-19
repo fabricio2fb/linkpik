@@ -25,6 +25,13 @@ function assertImportToken(request: Request) {
 }
 
 export async function POST(request: Request) {
+  if (process.env.NODE_ENV !== "production") {
+    console.log("[blog-import] route reached", {
+      hasAuthorization: Boolean(request.headers.get("authorization")),
+      hasExpectedToken: Boolean(process.env.BLOG_IMPORT_TOKEN),
+    });
+  }
+
   try {
     assertImportToken(request);
 
@@ -42,7 +49,7 @@ export async function POST(request: Request) {
         success: true,
         action: "test",
         site: SITE_CONFIG,
-        message: "Conexao realizada com sucesso.",
+        message: "Conexão realizada com sucesso.",
       });
     }
 
