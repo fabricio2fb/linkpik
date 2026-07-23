@@ -9,7 +9,7 @@ export default function BlogCTACard() {
       </div>
       <h3 className="mt-4 font-heading text-lg font-black">Crie sua loja</h3>
       <p className="mt-2 text-sm leading-6 text-white/80">
-        Monte sua loja virtual no Pikbio, conecte Mercado Pago e comece a vender produtos digitais em minutos.
+        Monte sua loja virtual no Pikbio, configure seu checkout e comece a vender produtos digitais em minutos.
       </p>
       <Link
         href="/registro"

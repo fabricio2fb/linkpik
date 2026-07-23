@@ -67,9 +67,9 @@ export default function ProductCard({
     borderRadius: buttonRadiusPx[theme.buttonRadius],
     fontWeight: theme.buttonWeight,
     textTransform: theme.buttonTransform,
-    borderColor: "rgba(255,255,255,0.12)",
-    color: "#ffffff",
-    background: "#071317",
+    borderColor: theme.cardBorderColor,
+    color: theme.buttonStyle === "filled" ? theme.buttonTextColor : theme.accentColor,
+    background: theme.buttonStyle === "filled" ? theme.accentColor : "transparent",
     borderWidth: 1,
     textDecoration: theme.buttonStyle === "underline" ? "underline" : "none",
   };

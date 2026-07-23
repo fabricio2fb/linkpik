@@ -161,7 +161,7 @@ export type Sale = {
   value: number;
   fee?: number;
   net?: number;
-  method: "Mercado Pago";
+  method: string;
   date: string;
   status: "Pago" | "Pendente";
   upsellProductId?: string;

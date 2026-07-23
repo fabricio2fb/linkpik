@@ -410,10 +410,10 @@ export default function BuyModal({ product, products = [], username, accentColor
             </div>
             <div>
               <p className="font-heading text-lg font-bold text-[var(--text-primary)]">
-                {stayInModal ? "Pagamento de demonstracao" : gateway === "mercadopago" ? "Redirecionando para o Mercado Pago" : "Redirecionando para o boleto Efi Bank"}
+                {stayInModal ? "Pagamento de demonstracao" : gateway === "mercadopago" ? "Redirecionando para o checkout" : "Redirecionando para o boleto"}
               </p>
               <p className="mt-1 text-sm text-[var(--text-secondary)]">
-                {stayInModal ? "Nesta loja de exemplo, o checkout continua dentro do modal." : gateway === "mercadopago" ? "Finalize o pagamento na pagina segura do Mercado Pago." : "Finalize o pagamento do boleto Efi Bank."}
+                {stayInModal ? "Nesta loja de exemplo, o checkout continua dentro do modal." : gateway === "mercadopago" ? "Finalize o pagamento na pagina segura do checkout." : "Finalize o pagamento do boleto."}
               </p>
             </div>
             {stayInModal ? (

@@ -33,7 +33,7 @@ export default function LandingNav() {
             : "border-white/[0.08] bg-[#0b0b0b]/62"
         }`}
       >
-        <BrandLogo textClassName="text-white" />
+        <BrandLogo textClassName="text-white" className="drop-shadow-[0_0_30px_rgba(255,77,109,0.5)_0_0_60px_rgba(255,77,109,0.25)]" />
 
         <div className="hidden items-center gap-8 text-sm font-bold text-white/52 md:flex">
           {navItems.map((item) => (

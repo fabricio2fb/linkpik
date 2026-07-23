@@ -6,7 +6,7 @@ import { useState } from "react";
 const faq = [
   { q: "Preciso ter CNPJ pra vender no Pikbio?", a: "Não. Você pode começar como pessoa física. Para operação recorrente e emissão fiscal, vale consultar um contador." },
   { q: "Tem taxa cobrada além da comissão por venda?", a: "No plano Free não há mensalidade. A Pikbio cobra comissão por venda: 10% no Free e 5% no Pro." },
-  { q: "Como funciona o recebimento via PIX/Mercado Pago/Efí?", a: "O pagamento é processado pelo gateway conectado pelo criador. O split separa automaticamente a taxa da Pikbio e o valor do criador." },
+  { q: "Como funciona o recebimento?", a: "O pagamento é processado pelo gateway conectado pelo criador. O split separa automaticamente a taxa da Pikbio e o valor do criador." },
   { q: "O comprador recebe confirmação automática da compra?", a: "Sim. Assim que o gateway confirma o pagamento por webhook, o pedido é atualizado e o acesso é liberado automaticamente." },
   { q: "Posso personalizar a pagina de cada produto?", a: "Sim. Cada produto pode ter uma pagina propria pelo construtor de secoes, sem precisar saber programacao." },
   { q: "Posso vender produto físico e digital na mesma loja?", a: "Sim. A loja aceita infoprodutos e produtos físicos, incluindo cálculo de frete e acompanhamento de pedido." },

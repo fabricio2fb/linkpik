@@ -122,11 +122,11 @@ export default function ComoFuncionaPage() {
               id="experiencia-de-compra"
               eyebrow="05 / Checkout e confirmacao"
               title="Experiência de compra do cliente"
-              text="O comprador clica no produto, ve a pagina criada por secoes, toca em Comprar e o checkout abre no proprio site. PIX aparece sempre inline, com QR Code e copia e cola, tanto no Mercado Pago quanto na Efi. Cartao e boleto podem abrir uma tela segura do processador, dependendo do gateway configurado."
+              text="O comprador clica no produto, ve a pagina criada por secoes, toca em Comprar e o checkout abre no proprio site. PIX aparece sempre inline, com QR Code e copia e cola. Cartao e boleto podem abrir uma tela segura do processador, dependendo do gateway configurado."
               icon={<CreditCard size={20} />}
             >
               <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
-                <FeatureList items={ ["Pagina do produto antes do checkout", "PIX inline no proprio site em Mercado Pago ou Efi", "Cartao e boleto podem abrir tela segura do processador", "Confirmacao automatica via webhook, sem aprovacao manual"] } />
+                <FeatureList items={ ["Pagina do produto antes do checkout", "PIX inline no proprio site", "Cartao e boleto podem abrir tela segura do processador", "Confirmacao automatica via webhook, sem aprovacao manual"] } />
                 {/* TODO: substituir por screenshot real do modal de checkout */}
                 <CheckoutMockup />
               </div>
@@ -138,7 +138,7 @@ export default function ComoFuncionaPage() {
                   <div>
                     <h3 className="font-heading text-xl font-black text-white">Confirmacao automatica, sem comprovante manual</h3>
                     <p className="mt-2 text-sm leading-7 text-white/56">
-                      PIX costuma confirmar em segundos. Cartao e boleto seguem o prazo normal do processador. Assim que Mercado Pago ou Efi enviam o webhook, o pedido muda de status e o acesso e liberado sem o criador precisar aprovar nada.
+                      PIX costuma confirmar em segundos. Cartao e boleto seguem o prazo normal do processador. Assim que o gateway envia o webhook, o pedido muda de status e o acesso e liberado sem o criador precisar aprovar nada.
                     </p>
                   </div>
                 </div>
@@ -175,7 +175,7 @@ export default function ComoFuncionaPage() {
               id="split"
               eyebrow="08 / Recebimento"
               title="Como funciona o recebimento"
-              text="O valor da venda é dividido automaticamente no momento do pagamento. O dinheiro vai direto para a conta do criador configurada no Mercado Pago ou Efí, com a taxa Pikbio descontada no split."
+              text="O valor da venda e dividido automaticamente no momento do pagamento. O dinheiro vai direto para a conta do criador configurada no gateway, com a taxa Pikbio descontada no split."
               icon={<WalletCards size={20} />}
             >
               <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">

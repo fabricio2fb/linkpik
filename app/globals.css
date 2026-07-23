@@ -284,9 +284,7 @@ button:disabled {
 }
 
 .site-light-landing .bg-\[\#FF4D6D\],
-.site-light-landing .bg-\[\#FF4D6D\] *,
-.site-light-landing [class*="bg-\\[\\#FF4D6D\\]"],
-.site-light-landing [class*="bg-\\[\\#FF4D6D\\]"] * {
+.site-light-landing [class*="bg-\\[\\#FF4D6D\\]"] {
   color: #ffffff !important;
 }
 

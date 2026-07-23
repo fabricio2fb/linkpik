@@ -6,6 +6,7 @@ type BrandLogoProps = {
   href?: string;
   compact?: boolean;
   className?: string;
+  imageSrc?: string;
   imageClassName?: string;
   textClassName?: string;
 };
@@ -14,13 +15,14 @@ export default function BrandLogo({
   href = "/",
   compact = false,
   className,
+  imageSrc = "/logo-pikbio.png",
   imageClassName,
   textClassName,
 }: BrandLogoProps) {
   const content = (
     <>
       <Image
-        src="/logo-pikbio.png"
+        src={imageSrc}
         alt=""
         width={40}
         height={40}

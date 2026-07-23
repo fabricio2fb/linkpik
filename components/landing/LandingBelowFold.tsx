@@ -119,7 +119,7 @@ export default function LandingBelowFold() {
                 const Icon = step.icon;
                 const left = index % 2 === 0;
                 const textCard = (
-                  <div className={`${left ? "lg:text-right" : "lg:text-left"} rounded-[28px] border border-white/[0.08] bg-[#111] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.32)] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D6D]/28`}>
+                  <div className={`${left ? "lg:text-right" : "lg:text-left"} rounded-[22px] border border-white/[0.08] bg-[#111] p-5 shadow-[0_24px_90px_rgba(0,0,0,0.32)] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D6D]/28`}>
                     <div className={`flex items-center gap-3 ${left ? "lg:justify-end" : ""}`}>
                       <span className="grid size-11 place-items-center rounded-2xl bg-[#FF4D6D]/12 text-[#FF4D6D]">
                         <Icon size={20} />
@@ -129,15 +129,15 @@ export default function LandingBelowFold() {
                         <h3 className="mt-1 font-heading text-xl font-black tracking-[-0.04em] text-white">{step.title}</h3>
                       </div>
                     </div>
-                    <p className="mt-4 text-sm leading-7 text-white/52">{step.text}</p>
+                    <p className="mt-4 text-sm leading-7 text-white/50">{step.text}</p>
                   </div>
                 );
                 const visualCard = <JourneyVisual type={step.visual} accent={step.accent} />;
                 return (
                   <Reveal key={step.title} delay={index === 1 ? "delay-100" : index === 2 ? "delay-200" : ""}>
-                    <div className="relative grid gap-4 lg:grid-cols-[1fr_86px_1fr] lg:items-center">
+                    <div className="relative grid gap-4 lg:grid-cols-[0.82fr_76px_1.18fr] lg:items-center">
                       {left ? textCard : <div className="hidden lg:block">{visualCard}</div>}
-                      <div className="absolute left-5 top-5 grid size-10 place-items-center rounded-full border border-[#FF4D6D]/40 bg-[#0A0A0A] font-heading text-sm font-black text-[#FF8EA2] lg:static lg:mx-auto lg:size-14">
+                      <div className="absolute left-5 top-5 grid size-10 place-items-center rounded-full border border-[#FF4D6D]/40 bg-[#0A0A0A] font-heading text-sm font-black text-[#FF8EA2] lg:static lg:mx-auto lg:size-12">
                         {String(index + 1).padStart(2, "0")}
                       </div>
                       {left ? <div className="hidden lg:block">{visualCard}</div> : textCard}
@@ -163,7 +163,7 @@ export default function LandingBelowFold() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-[var(--carousel-fade)] to-transparent" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-[var(--carousel-fade)] to-transparent" />
             <div className="landing-template-track flex w-max gap-4 py-2">
-              {[...templateIds, ...templateIds].map((templateId, index) => (
+              {[...templateIds.filter((templateId) => templateId !== "minimal"), ...templateIds.filter((templateId) => templateId !== "minimal")].map((templateId, index) => (
                 <TemplateCarouselCard key={`${templateId}-${index}`} templateId={templateId} />
               ))}
             </div>
@@ -185,7 +185,7 @@ export default function LandingBelowFold() {
             price="R$ 0"
             suffix="/mes"
             description="Sem mensalidade. Pague apenas quando vender."
-            features={["Loja na bio", "Ate 5 produtos", "Checkout Mercado Pago", "Upsell basico", "Analytics basico"]}
+            features={["Loja na bio", "Ate 5 produtos", "Checkout integrado", "Upsell basico", "Analytics basico"]}
             missing={["Produtos ilimitados", "Integracoes de pixel", "Remover marca d'agua"]}
             cta="Comecar gratis"
           />
@@ -206,8 +206,8 @@ export default function LandingBelowFold() {
         <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.28em] text-[#FF4D6D]">FAQ</p>
-            <h2 className="mt-4 font-heading text-4xl font-black tracking-[-0.06em]">Perguntas que aparecem antes da primeira venda.</h2>
-            <p className="mt-5 text-base leading-7 text-white/50">Respostas diretas para quem quer comecar rapido e entender o modelo.</p>
+            <h2 className="mt-4 font-heading text-4xl font-black tracking-[-0.06em]">Perguntas antes de publicar sua loja.</h2>
+            <p className="mt-5 text-base leading-7 text-white/50">O essencial para entender pagamento, entrega, planos e uso da plataforma.</p>
           </div>
           <div className="overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#111]">
             {faq.map((item, index) => (
@@ -246,7 +246,7 @@ export default function LandingBelowFold() {
           <div className="grid gap-8 md:grid-cols-[1.4fr_0.8fr_0.8fr]">
             <div>
               <BrandLogo imageClassName="size-9" textClassName="text-2xl text-white" />
-              <p className="mt-4 max-w-sm text-sm leading-7 text-white/44">Loja na bio para criadores brasileiros venderem produtos digitais com Mercado Pago, upsell e entrega automatica.</p>
+              <p className="mt-4 max-w-sm text-sm leading-7 text-white/44">Loja na bio para criadores brasileiros venderem produtos digitais com checkout, upsell e entrega automatica.</p>
               <div className="mt-5 flex gap-3 text-white/40">
                 <a href="https://www.instagram.com/pikbio.app/" target="_blank" rel="noopener noreferrer" className="transition hover:text-white"><Instagram size={18} /></a>
                 <a href="https://tiktok.com/@pikbio" target="_blank" rel="noopener noreferrer" className="transition hover:text-white"><Music2 size={18} /></a>
@@ -395,13 +395,13 @@ function FlowMockPayment() {
         <p className="text-[10px] font-black uppercase tracking-[0.16em] text-black/35">Pedido #1842</p>
         <div className="mt-1 flex items-center justify-between">
           <p className="text-sm font-black">Planilha 12 semanas</p>
-          <span className="rounded-full bg-[#22C55E]/12 px-2 py-1 text-[10px] font-black text-[#16A34A]">MP</span>
+          <span className="rounded-full bg-[#22C55E]/12 px-2 py-1 text-[10px] font-black text-[#16A34A]">OK</span>
         </div>
       </div>
       <div className="grid gap-4 p-4">
         <div className="flex items-center gap-4">
           <div className="grid size-24 shrink-0 place-items-center rounded-lg border border-black/10 bg-[#009EE3] p-3 text-center text-xs font-black text-white">
-            Mercado Pago
+            Checkout
           </div>
           <div className="min-w-0">
             <p className="text-[10px] font-black uppercase tracking-[0.14em] text-black/35">Total</p>
@@ -426,86 +426,93 @@ function FlowMockPayment() {
 }
 
 function JourneyVisual({ type, accent }: { type: "store" | "product" | "checkout" | "access" | "dashboard"; accent: string }) {
-  const rows = {
-    store: ["Perfil do criador", "Produto em destaque", "Botao comprar"],
-    product: ["Imagem + titulo", "Preco claro", "Oferta pronta"],
-    checkout: ["Dados do comprador", "Pagamento", "Confirmacao"],
-    access: ["Token seguro", "Link liberado", "Email enviado"],
-    dashboard: ["Receita", "Vendas", "Acessos"],
-  }[type];
+  const product = landingProducts[0];
+  const upsell = landingProducts[1];
 
   return (
-    <div className="relative overflow-hidden rounded-[28px] border border-white/[0.08] bg-[#0f0f0f] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.34)]">
-      <div className="absolute -right-12 -top-12 size-32 rounded-full opacity-20 blur-3xl" style={{ backgroundColor: accent }} />
-      <div className="relative rounded-[22px] border border-white/[0.08] bg-[#070707] p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex gap-1.5">
-            <span className="size-2 rounded-full bg-red-400/70" />
-            <span className="size-2 rounded-full bg-yellow-400/70" />
-            <span className="size-2 rounded-full bg-green-400/70" />
-          </div>
-          <span className="rounded-full px-2 py-1 text-[9px] font-black uppercase text-white" style={{ backgroundColor: accent }}>
-            ao vivo
-          </span>
-        </div>
+    <div className="relative overflow-hidden rounded-[30px] border border-white/[0.08] bg-[#101010] p-3 shadow-[0_28px_90px_rgba(0,0,0,0.38)]">
+      <div className="absolute -right-16 -top-16 size-48 opacity-20 blur-3xl" style={{ backgroundColor: accent }} />
+      <div className="relative overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#070707]">
+        <JourneyChrome accent={accent} label={journeyLabels[type]} />
+        {type === "store" && <JourneyStorePreview />}
+        {type === "product" && <JourneyProductPreview />}
+        {type === "checkout" && <JourneyCheckoutPreview accent={accent} productName={product.name} upsellName={upsell.name} />}
+        {type === "access" && <JourneyAccessPreview />}
+        {type === "dashboard" && <JourneyDashboardPreview accent={accent} />}
+      </div>
+    </div>
+  );
+}
 
-        <div className="mt-5 grid gap-3">
-          {type === "store" && (
-            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04]">
-              <div className="h-16" style={{ background: `linear-gradient(135deg, ${accent}, rgba(255,255,255,0.08))` }} />
-              <div className="p-3">
-                <div className="-mt-9 grid size-12 place-items-center rounded-full border-4 border-[#101010] text-xs font-black text-white" style={{ backgroundColor: accent }}>PK</div>
-                <div className="mt-3 h-3 w-28 rounded-full bg-white/24" />
-                <div className="mt-2 h-2 w-40 rounded-full bg-white/12" />
+function JourneyChrome({ accent, label }: { accent: string; label: string }) {
+  return (
+    <div className="flex items-center justify-between border-b border-white/[0.07] bg-black/35 px-4 py-3">
+      <div className="flex gap-1.5">
+        <span className="size-2 rounded-full bg-[#FF5F57]" />
+        <span className="size-2 rounded-full bg-[#FFBD2E]" />
+        <span className="size-2 rounded-full bg-[#28C840]" />
+      </div>
+      <span className="rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-white" style={{ backgroundColor: accent }}>
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function JourneyStorePreview() {
+  return (
+    <div className="bg-[#050505] p-4">
+      <div className="mx-auto max-w-[300px] overflow-hidden rounded-[28px] border border-white/12 bg-[linear-gradient(145deg,#2A2A2A,#080808)] p-2 shadow-[0_26px_70px_rgba(0,0,0,0.42)]">
+        <div className="overflow-hidden rounded-[22px] bg-[#0b0b0b] text-white">
+          <div className="flex h-8 items-center justify-between bg-black px-4 text-[9px] font-black text-white/45">
+            <span>9:41</span>
+            <span>Instagram</span>
+            <span>5G</span>
+          </div>
+          <div className="p-4">
+            <div className="flex items-center gap-4">
+              <div className="grid size-20 place-items-center rounded-full bg-[conic-gradient(#FF4D6D,#F59E0B,#7C3AED,#FF4D6D)] p-1">
+                <div className="grid size-full place-items-center rounded-full border-4 border-[#0b0b0b] bg-[#FF4D6D] text-xl font-black">AF</div>
               </div>
-            </div>
-          )}
-          {type === "product" && (
-            <div className="grid grid-cols-[82px_1fr] gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3">
-              <div className="aspect-square rounded-xl" style={{ background: `linear-gradient(135deg, ${accent}, rgba(255,255,255,0.12))` }} />
-              <div className="min-w-0">
-                <div className="h-3 w-32 rounded-full bg-white/24" />
-                <div className="mt-2 h-2 w-24 rounded-full bg-white/12" />
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="font-heading text-lg font-black" style={{ color: accent }}>R$ 47</span>
-                  <span className="h-8 w-20 rounded-full" style={{ backgroundColor: accent }} />
+              <div className="grid flex-1 grid-cols-3 text-center">
+                <div>
+                  <p className="font-heading text-lg font-black">142</p>
+                  <p className="text-[10px] font-bold text-white/42">posts</p>
+                </div>
+                <div>
+                  <p className="font-heading text-lg font-black">38k</p>
+                  <p className="text-[10px] font-bold text-white/42">seguidores</p>
+                </div>
+                <div>
+                  <p className="font-heading text-lg font-black">512</p>
+                  <p className="text-[10px] font-bold text-white/42">seguindo</p>
                 </div>
               </div>
             </div>
-          )}
-          {type === "checkout" && (
-            <div className="rounded-2xl border border-white/[0.08] bg-white p-4 text-black">
-              <div className="h-3 w-28 rounded-full bg-black/15" />
-              <div className="mt-4 grid gap-2">
-                <div className="h-9 rounded-xl bg-black/[0.06]" />
-                <div className="h-9 rounded-xl bg-black/[0.06]" />
-                <div className="h-10 rounded-full text-center text-xs font-black leading-10 text-white" style={{ backgroundColor: accent }}>Pagar agora</div>
+            <div className="mt-4">
+              <p className="text-sm font-black">Ana Fitness</p>
+              <p className="mt-1 text-xs leading-5 text-white/60">Treinos, planilhas e rotina real.</p>
+              <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/[0.06] px-3 py-2 text-xs font-black text-[#8AB4FF]">
+                <MousePointerClick size={14} />
+                pik.bio/anafitness
               </div>
             </div>
-          )}
-          {type === "access" && (
-            <div className="rounded-2xl border border-[#22C55E]/20 bg-[#22C55E]/10 p-4">
-              <p className="flex items-center gap-2 text-sm font-black text-[#22C55E]"><Check size={16} /> Acesso liberado</p>
-              <div className="mt-4 rounded-full border border-white/[0.08] bg-black/30 px-4 py-3 text-xs font-bold text-white/62">/acesso/pkb••••</div>
-            </div>
-          )}
-          {type === "dashboard" && (
-            <div className="grid grid-cols-3 gap-2">
-              {["R$ 4.8k", "124", "98%"].map((item) => (
-                <div key={item} className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3">
-                  <p className="font-heading text-lg font-black" style={{ color: accent }}>{item}</p>
-                  <div className="mt-2 h-2 rounded-full bg-white/12" />
-                </div>
+            <div className="mt-4 grid grid-cols-3 gap-1.5">
+              {[
+                "bg-[linear-gradient(135deg,#FF4D6D,#F59E0B)]",
+                "bg-[linear-gradient(135deg,#22C55E,#38BDF8)]",
+                "bg-[linear-gradient(135deg,#7C3AED,#FF4D6D)]",
+                "bg-[linear-gradient(135deg,#F59E0B,#111)]",
+                "bg-[linear-gradient(135deg,#38BDF8,#111)]",
+                "bg-[linear-gradient(135deg,#22C55E,#111)]",
+              ].map((className, index) => (
+                <div key={index} className={`aspect-square rounded-sm ${className}`} />
               ))}
             </div>
-          )}
-          <div className="grid gap-2">
-            {rows.map((row, index) => (
-              <div key={row} className="flex items-center justify-between rounded-xl bg-white/[0.04] px-3 py-2">
-                <span className="text-xs font-bold text-white/56">{row}</span>
-                <span className="size-2 rounded-full landing-flow-dot" style={{ backgroundColor: index === rows.length - 1 ? "#22C55E" : accent }} />
-              </div>
-            ))}
+            <div className="mt-4 rounded-2xl border border-[#FF4D6D]/30 bg-[#FF4D6D]/12 p-3">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#FF8EA2]">Acao do cliente</p>
+              <p className="mt-1 text-sm font-black">Toca no link da bio para abrir a loja</p>
+            </div>
           </div>
         </div>
       </div>
@@ -513,60 +520,234 @@ function JourneyVisual({ type, accent }: { type: "store" | "product" | "checkout
   );
 }
 
+function JourneyProductPreview() {
+  return (
+    <div className="bg-[#050505] p-4">
+      <div className="mx-auto max-w-[300px] overflow-hidden rounded-[28px] border border-white/12 bg-[linear-gradient(145deg,#2A2A2A,#080808)] p-2 shadow-[0_26px_70px_rgba(0,0,0,0.42)]">
+        <div className="overflow-hidden rounded-[22px] bg-[#080808]">
+          <div className="h-7 truncate bg-black px-4 text-[9px] font-black leading-7 text-white/42">pik.bio/anafitness</div>
+          <div className="h-[390px] overflow-hidden">
+            <StorePage
+              creator={{ ...landingCreator, coverImage: null }}
+              products={landingProducts}
+              theme={THEME_PRESETS.cards}
+              embedded
+              previewMode
+              onProductClick={() => undefined}
+            />
+          </div>
+          <div className="border-t border-white/[0.08] bg-[#111] p-3">
+            <div className="flex items-center gap-2 rounded-full bg-[#FF4D6D] px-4 py-3 text-sm font-black text-white">
+              <ShoppingBag size={16} />
+              Cliente escolhe: {landingProducts[0].name}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function JourneyCheckoutPreview({ accent, productName, upsellName }: { accent: string; productName: string; upsellName: string }) {
+  return (
+    <div className="grid gap-4 bg-[#F8F8F6] p-4 text-[#111] md:grid-cols-[1fr_0.9fr]">
+      <div className="rounded-[22px] border border-black/10 bg-white p-4 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/35">Resumo do pedido</p>
+        <div className="mt-4 grid gap-3">
+          <CheckoutLine title={productName} value="R$ 47,00" color={accent} />
+          <CheckoutLine title={upsellName} value="R$ 19,00" color="#22C55E" />
+        </div>
+        <div className="mt-5 rounded-2xl bg-[#111] p-4 text-white">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-bold text-white/50">Total</span>
+            <span className="font-heading text-2xl font-black">R$ 66,00</span>
+          </div>
+          <div className="mt-4 grid h-11 place-items-center rounded-full text-sm font-black text-white" style={{ backgroundColor: accent }}>
+            Continuar para pagamento
+          </div>
+        </div>
+      </div>
+      <div className="rounded-[22px] border border-black/10 bg-white p-4 shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
+        <p className="text-[10px] font-black uppercase tracking-[0.18em] text-black/35">Comprador</p>
+        <div className="mt-4 grid gap-3">
+          <CheckoutInput label="Nome" value="Maria Souza" />
+          <CheckoutInput label="Email" value="maria@email.com" />
+          <CheckoutInput label="Pagamento" value="Checkout seguro" />
+        </div>
+        <div className="mt-4 flex items-center gap-2 rounded-2xl bg-[#ECFDF3] px-3 py-3 text-xs font-black text-[#166534]">
+          <ShieldCheck size={16} />
+          Checkout seguro e pedido registrado
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CheckoutLine({ title, value, color }: { title: string; value: string; color: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-black/10 bg-[#F8F8F6] p-3">
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl text-white" style={{ backgroundColor: color }}>
+        <Package size={18} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-black">{title}</p>
+        <p className="mt-0.5 text-[11px] font-bold text-black/40">Entrega digital</p>
+      </div>
+      <p className="text-sm font-black">{value}</p>
+    </div>
+  );
+}
+
+function CheckoutInput({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-black/10 bg-[#F8F8F6] px-3 py-2.5">
+      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-black/35">{label}</p>
+      <p className="mt-1 text-sm font-black">{value}</p>
+    </div>
+  );
+}
+
+function JourneyAccessPreview() {
+  const product = landingProducts[0];
+
+  return (
+    <div className="bg-[#080808] p-4">
+      <div className="mx-auto grid min-h-[430px] max-w-[420px] place-items-center rounded-[24px] border border-[#FF4D6D]/18 bg-[#101010] px-5 py-6 text-white shadow-[0_24px_80px_rgba(0,0,0,0.35)]">
+        <section className="w-full max-w-md">
+          <div className="mb-6 aspect-video w-full overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#FF4D6D,#7C3AED_58%,#111)] p-4">
+            <div className="flex h-full flex-col justify-between rounded-xl border border-white/15 bg-black/20 p-4 text-white">
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/52">Produto digital</p>
+              <div>
+                <p className="font-heading text-2xl font-black tracking-[-0.05em]">Planilha 12 semanas</p>
+                <p className="mt-1 text-xs font-bold text-white/55">Excel (.xlsx) + checklist</p>
+              </div>
+            </div>
+          </div>
+          <p className="text-sm font-semibold text-white/52">Ola, Maria Souza</p>
+          <h3 className="mt-2 font-heading text-3xl font-black tracking-[-0.055em]">{product.name}</h3>
+          <p className="mt-3 text-sm capitalize text-white/46">{product.type}</p>
+          <div className="mt-6 whitespace-pre-wrap rounded-2xl border border-white/[0.08] bg-white/[0.05] p-4 text-sm leading-6 text-white/58">
+            Seu pagamento foi confirmado. Use o botao abaixo para abrir o conteudo configurado pelo criador.
+          </div>
+          <div className="mt-4 whitespace-pre-wrap rounded-2xl border border-white/[0.08] bg-[#FF4D6D]/10 p-4 text-sm leading-6 text-white/62">
+            Obrigado pela compra. O link tambem foi enviado para o email informado no checkout.
+          </div>
+          <div className="mt-7 inline-flex w-full justify-center rounded-[10px] bg-[#FF4D6D] px-5 py-4 text-sm font-bold text-white shadow-[0_18px_48px_rgba(255,77,109,0.28)]">
+            Baixar produto
+          </div>
+          <div className="mt-4 inline-flex w-full justify-center rounded-[10px] border border-white/[0.10] bg-white/[0.06] px-5 py-4 text-sm font-bold text-white">
+            Acessar conteudo
+          </div>
+          <p className="mt-4 text-center text-xs text-white/34">Este link de download expira em 30 minutos.</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function AccessRow({ title, meta }: { title: string; meta: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3">
+      <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#22C55E]/12 text-[#22C55E]">
+        <Check size={18} />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-black text-white">{title}</p>
+        <p className="text-xs font-bold text-white/36">{meta}</p>
+      </div>
+      <span className="rounded-full bg-[#22C55E]/12 px-3 py-1.5 text-[10px] font-black uppercase text-[#22C55E]">ativo</span>
+    </div>
+  );
+}
+
+function JourneyDashboardPreview({ accent }: { accent: string }) {
+  const salesRows = [
+    ["Planilha 12 semanas", "R$ 47", "Pago"],
+    ["Ebook Dieta Low Carb", "R$ 27", "Pago"],
+    ["Mentoria 1h por Video", "R$ 197", "Pendente"],
+  ];
+
+  return (
+    <div className="bg-[#090909] p-4">
+      <div className="rounded-[24px] border border-white/[0.08] bg-[#101010] p-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-white/32">Dashboard do criador</p>
+            <h3 className="mt-1 font-heading text-3xl font-black tracking-[-0.055em] text-white">Visao geral</h3>
+          </div>
+          <span className="rounded-full bg-[#22C55E]/12 px-3 py-2 text-xs font-black text-[#22C55E]">loja ativa</span>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <DashboardMetric value="R$ 4.890" label="receita" accent={accent} />
+          <DashboardMetric value="124" label="vendas" accent="#22C55E" />
+          <DashboardMetric value="8" label="produtos" accent="#38BDF8" />
+          <DashboardMetric value="98%" label="entregas" accent="#F59E0B" />
+        </div>
+        <div className="mt-5 overflow-hidden rounded-2xl border border-white/[0.08]">
+          {salesRows.map(([product, value, status]) => (
+            <div key={product} className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-white/[0.06] p-3 last:border-b-0">
+              <p className="min-w-0 truncate text-sm font-bold text-white/76">{product}</p>
+              <p className="text-sm font-black" style={{ color: accent }}>{value}</p>
+              <p className={status === "Pago" ? "text-sm font-black text-[#22C55E]" : "text-sm font-black text-[#F59E0B]"}>
+                {status}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DashboardMetric({ value, label, accent }: { value: string; label: string; accent: string }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-3">
+      <p className="font-heading text-xl font-black tracking-[-0.04em]" style={{ color: accent }}>{value}</p>
+      <p className="mt-1 text-[10px] font-black uppercase text-white/34">{label}</p>
+    </div>
+  );
+}
+
+const journeyLabels = {
+  store: "loja",
+  product: "produto",
+  checkout: "checkout",
+  access: "acesso",
+  dashboard: "painel",
+};
 function TemplateCarouselCard({ templateId }: { templateId: TemplateId }) {
   const template = storeTemplates[templateId];
   const theme = THEME_PRESETS[templateId];
   const details = templateDetails[templateId];
 
   return (
-    <div className="w-[300px] shrink-0 overflow-hidden rounded-[30px] border border-white/[0.08] bg-[#111] shadow-[0_24px_80px_rgba(0,0,0,0.36)] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D6D]/30">
-      <div className="p-3">
-        <div
-          className="overflow-hidden rounded-[24px] border border-white/[0.08] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-          style={{ background: theme.backgroundColor }}
-        >
-          <div className="relative h-24 overflow-hidden rounded-2xl" style={{ background: `linear-gradient(135deg, ${template.defaultAccent}, rgba(255,255,255,0.08))` }}>
-            <div className="absolute -right-8 -top-8 size-28 rounded-full bg-white/20 blur-2xl" />
-            <div className="absolute bottom-3 left-3 h-2 w-20 rounded-full bg-white/35" />
-            <div className="absolute bottom-3 right-3 h-2 w-10 rounded-full bg-white/20" />
-          </div>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="grid size-10 place-items-center rounded-full text-xs font-black text-white" style={{ backgroundColor: template.defaultAccent }}>
-              PK
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-black text-white">Creator Store</p>
-              <p className="text-[10px] font-bold text-white/42">{details.tag}</p>
-            </div>
-          </div>
-          <div className="mt-4 grid gap-2">
-            {[0, 1].map((item) => (
-              <div key={item} className="rounded-2xl border border-white/[0.08] bg-white/[0.06] p-3 transition duration-300 group-hover:bg-white/[0.08]">
-                <div className="h-14 rounded-xl bg-white/[0.08]" />
-                <div className="mt-3 h-3 w-4/5 rounded-full bg-white/20" />
-                <div className="mt-2 flex items-center justify-between">
-                  <div className="h-3 w-14 rounded-full bg-white/12" />
-                  <div className="h-7 w-20 rounded-full" style={{ backgroundColor: template.defaultAccent }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center justify-between gap-3 border-t border-white/[0.07] px-4 py-3">
-        <div className="min-w-0">
-          <h4 className="font-heading text-lg font-black tracking-[-0.04em] text-white">{template.name}</h4>
-          <div className="mt-1 flex gap-1.5">
-            {[theme.storeLayout, theme.cardLayout].map((item) => (
-              <span key={item} className="rounded-full bg-white/[0.05] px-2 py-1 text-[9px] font-black uppercase text-white/34">
-                {item}
-              </span>
-            ))}
-          </div>
-        </div>
-        <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2.5 py-1.5 text-[10px] font-black uppercase text-white/44">
+    <div className="w-[340px] shrink-0 overflow-hidden rounded-[30px] bg-[#050505] p-3 shadow-[0_24px_80px_rgba(0,0,0,0.36)] transition duration-300 hover:-translate-y-1">
+      <div className="mb-3 flex items-center justify-between gap-3 px-1">
+        <h4 className="min-w-0 truncate font-heading text-xl font-black tracking-[-0.04em] text-white">{template.name}</h4>
+        <span className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.06] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] text-white/52">
           {details.tag}
         </span>
+      </div>
+      <div className="relative mx-auto h-[560px] overflow-hidden rounded-[26px] shadow-[0_26px_70px_rgba(0,0,0,0.36)]" style={{ background: theme.backgroundColor }}>
+        <StorePage
+          creator={{
+            ...landingCreator,
+            coverImage: null,
+            avatarColor: template.defaultAccent,
+            accentColor: template.defaultAccent,
+            template: templateId,
+            theme,
+          }}
+          products={landingProducts}
+          theme={{
+            ...theme,
+            storeLayout: templateId === "minimal" ? "grid1" : theme.storeLayout,
+          }}
+          embedded
+          previewMode
+          onProductClick={() => undefined}
+          hideBranding
+        />
       </div>
     </div>
   );
@@ -667,7 +848,7 @@ const flowSteps = [
     number: "03",
     icon: Wallet,
     title: "Receba e entregue",
-    text: "Checkout Mercado Pago, upsell oferecido e acesso enviado por email no fluxo de compra.",
+    text: "Checkout integrado, upsell oferecido e acesso enviado por email no fluxo de compra.",
     visual: <FlowMockPayment />,
   },
 ];
@@ -679,7 +860,7 @@ const clientJourney = [
     visual: "store" as const,
     accent: "#FF4D6D",
     title: "Cliente toca no link da bio",
-    text: "Ele cai direto na loja do criador, com perfil, produtos e visual pronto para comprar.",
+    text: "A jornada comeca no perfil do Instagram do criador. O comprador ve a bio e toca no link Pikbio.",
   },
   {
     label: "Escolha",
@@ -718,7 +899,7 @@ const clientJourney = [
 const demoJourney = [
   { icon: ShoppingBag, title: "Produto escolhido", time: "0s", text: "O cliente clica no card e ve resumo, preco e campos sem sair da loja." },
   { icon: Sparkles, title: "Upsell opcional", time: "15s", text: "Uma oferta complementar aparece com desconto, sempre com recusa facil." },
-  { icon: Zap, title: "Checkout aberto", time: "30s", text: "O cliente segue para o pagamento seguro do Mercado Pago com o pedido consolidado." },
+  { icon: Zap, title: "Checkout aberto", time: "30s", text: "O cliente segue para o pagamento seguro com o pedido consolidado." },
   { icon: ShieldCheck, title: "Entrega confirmada", time: "60s", text: "A tela final mostra quais produtos serao enviados para o email informado." },
 ];
 
@@ -766,10 +947,32 @@ const templateDetails: Record<TemplateId, { tag: string; description: string; bu
 };
 
 const faq = [
-  { q: "Preciso ter CNPJ?", a: "Nao. O MVP foi pensado para criadores validarem produtos digitais rapidamente. Em operacao real, regras fiscais devem ser avaliadas com um contador." },
-  { q: "Quais produtos posso vender?", a: "E-books, PDFs, planilhas, templates, cursos, mentorias, packs e comunidades. O foco do MVP e 100% digital." },
-  { q: "O pagamento e real?", a: "Nao neste projeto. O fluxo de checkout e confirmacao e mockado para demonstrar UX e produto." },
-  { q: "Posso mudar o visual da loja?", a: "Sim. O tema controla cores, fonte, avatar, cards, botoes, links e layout, com preview ao vivo." },
-  { q: "A pagina funciona no celular?", a: "Sim. A experiencia publica e mobile-first, e o dashboard tambem tem ajustes para mobile, tablet e desktop." },
-  { q: "Tem upsell?", a: "Sim. O produto pode oferecer outro produto como upsell antes do pagamento." },
+  {
+    q: "Preciso ter CNPJ para vender?",
+    a: "Nao. Voce pode comecar como pessoa fisica. Para operacao recorrente, emissao fiscal e regras tributarias, o ideal e validar com um contador.",
+  },
+  {
+    q: "Quais produtos posso vender no Pikbio?",
+    a: "Voce pode vender produtos digitais como ebooks, PDFs, planilhas, templates, cursos, packs, mentorias e comunidades. O painel tambem possui areas para produtos fisicos.",
+  },
+  {
+    q: "Como funciona o pagamento?",
+    a: "O comprador passa pelo checkout e o pagamento e processado pelo gateway conectado pelo criador. Depois da confirmacao, o pedido muda de status automaticamente.",
+  },
+  {
+    q: "Como o comprador recebe o acesso?",
+    a: "Quando o pagamento e aprovado, o Pikbio gera um link seguro de acesso e envia para o email informado na compra. A pagina de acesso mostra o produto, mensagens e botoes configurados pelo criador.",
+  },
+  {
+    q: "Posso personalizar a loja?",
+    a: "Sim. Voce pode ajustar perfil, capa, avatar, cores, links, produtos, ordem dos cards e tema visual para deixar a loja com a identidade da sua marca.",
+  },
+  {
+    q: "Consigo vender mais de um produto no mesmo pedido?",
+    a: "Sim. Voce pode configurar upsell para oferecer um produto complementar durante a compra e aumentar o valor medio do pedido.",
+  },
+  {
+    q: "A loja funciona bem no celular?",
+    a: "Sim. A experiencia publica e mobile-first, pensada para quem chega pelo Instagram, TikTok, WhatsApp ou qualquer link na bio.",
+  },
 ];
